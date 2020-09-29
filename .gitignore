@@ -1,0 +1,13 @@
+# Generated configuration
+cfg.h
+
+# Compiler outputs
+*.so
+*.a
+*.lib
+*.exe
+*.h.gch
+
+# IDEA garbage
+.idea/
+.run/
