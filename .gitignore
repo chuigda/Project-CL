@@ -1,6 +1,10 @@
 # Generated configuration
 cfg.h
 
+# User's implementation files
+*.user.c
+*.user.h
+
 # Qt project configurations
 cclib.config
 cclib.includes
@@ -11,6 +15,9 @@ cclib.creator
 cclib.creator.user
 
 # Compiler outputs
+*.o
+*.out
+*.obj
 *.so
 *.a
 *.lib
