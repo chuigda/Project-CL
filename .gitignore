@@ -1,6 +1,15 @@
 # Generated configuration
 cfg.h
 
+# Qt project configurations
+cclib.config
+cclib.includes
+cclib.files
+cclib.cflags
+cclib.cxxflags
+cclib.creator
+cclib.creator.user
+
 # Compiler outputs
 *.so
 *.a
