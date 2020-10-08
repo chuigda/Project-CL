@@ -8,10 +8,10 @@ extern "C" {
 #endif
 
 extern void cclib_assert_impl(int value,
-                              const char *expr,
-                              const char *file,
-                              unsigned line,
-                              const char *text);
+                               const char *expr,
+                               const char *file,
+                               unsigned line,
+                               const char *text);
 
 #ifndef CC_NDEBUG
 #   define CC_ASSERT(expr) \
@@ -32,7 +32,7 @@ extern void cclib_assert_impl(int value,
 #endif
 
 #ifdef __cplusplus
-} // extern "C"
+} /* extern "C" */
 #endif
 
 #endif /* CCLIB_ASSERT_H */

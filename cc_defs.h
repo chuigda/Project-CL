@@ -19,4 +19,4 @@ typedef CCLIB_SSIZE_TYPE CCTY(cc_ssize);
 #   define NULL ((void*)0)
 #endif
 
-#endif // CC_DEFS_H
+#endif /* CC_DEFS_H */

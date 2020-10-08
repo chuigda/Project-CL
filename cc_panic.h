@@ -10,7 +10,7 @@ extern "C" {
 extern void CCFN(cc_panic) (void);
 
 #ifdef __cplusplus
-} // extern "C"
+} /* extern "C" */
 #endif
 
-#endif // CC_PANIC_H
+#endif /* CC_PANIC_H */

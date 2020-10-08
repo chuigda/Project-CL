@@ -18,4 +18,4 @@ typedef uint32_t CCTY(cc_uint32);
 typedef uint64_t CCTY(cc_uint64);
 #endif
 
-#endif // CC_INTTYPES_H
+#endif /* CC_INTTYPES_H */

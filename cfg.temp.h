@@ -121,6 +121,15 @@
  * */
 #define CCLIB_DS_MAP    CC_FEAT_USE_CCLIB
 
+/** MString, use handle to represent strings
+ *
+ * This feature is inaccessible if CCLIB_ALLOC is DISABLED
+ *
+ * Possible choices: DISABLED, CCLIB
+ *
+ * */
+#define CCLIB_MSTRING   CC_FEAT_USE_CCLIB
+
 /** Easy Going Configuration, the flat configuration file
  *
  * Possible choices: DISABLED, CCLIB
