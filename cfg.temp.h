@@ -11,8 +11,21 @@
 #define CC_FEAT_DISABLED  /* Disable this feature   */             0
 #define CC_FEAT_USE_STD   /* Wrap C standard library */            1
 #define CC_FEAT_USE_CCLIB /* Use CCLIB's own implementation */     2
-#define CC_FEAT_USE_GLIB  /* Use GLIB to implement */              3
-#define CC_FEAT_USE_USER  /* Let user to provide implementation */ 4
+#define CC_FEAT_USE_USER  /* Let user to provide implementation */ 3
+
+/** Dynamic memory allocation
+ *
+ * Possible choices: DISABLED, STD, CCLIB, USER
+ *
+ *   - If DISABLED choosed, dynamic memory allocation will not be
+ *     accessible
+ *   - If STD choosed, CCLIB will simply use malloc
+ *   - If CCLIB choosed, CCLIB will use an internal, static only
+ *     allocator.
+ *   - If USER choosed, CCLIB will use implementations from
+ *     cc_alloc.user.c
+ * */
+#define CCLIB_ALLOC     CC_FEAT_USE_STD
 
 /** Integer types library
  *
