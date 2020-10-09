@@ -21,7 +21,8 @@ OBJECTS := \
 		out/cc_assert.o \
 		out/cc_disp.o \
 		out/cc_panic.o \
-		out/cc_string.o
+		out/cc_string.o \
+                out/cc_vec.o
 
 .PHONY: all
 all: \
@@ -53,12 +54,7 @@ staticlib_prompt:
 
 out/lib/libcclib.a: $(OBJECTS)
 	@$(LOG) AR out/lib/libcclib.a
-	@$(AR) -rcs out/lib/libcclib.a \
-		out/cc_alloc.o \
-		out/cc_assert.o \
-		out/cc_disp.o \
-		out/cc_panic.o \
-		out/cc_string.o
+	@$(AR) -rcs out/lib/libcclib.a $(OBJECTS)
 	@$(LOG) CHMOD out/lib/libcclib.a
 	@chmod a+x out/lib/libcclib.a
 
@@ -71,12 +67,7 @@ dynamiclib_prompt:
 
 out/lib/libcclib.so: $(OBJECTS)
 	@$(LOG) LINK out/lib/libcclib.so
-	@$(CC) -shared -o out/lib/libcclib.so \
-		out/cc_alloc.o \
-		out/cc_assert.o \
-		out/cc_disp.o \
-		out/cc_panic.o \
-		out/cc_string.o
+	@$(CC) -shared -o out/lib/libcclib.so $(OBJECTS)
 
 .PHONY: objects objects_prompt
 objects: objects_prompt $(OBJECTS)
@@ -140,6 +131,16 @@ out/cc_string.o: $(HEADERS) $(CFG_HEADER) \
 		-I out/include/ \
 		-I out/src/
 
+out/cc_vec.o: $(HEADERS) $(CFG_HEADER) \
+		out/src/cc_vec.c
+	@$(LOG) CC out/src/cc_vec.c
+	@$(CC) $(CFLAGS) $(WARNINGS) \
+		out/src/cc_vec.c \
+                -c -fPIC \
+                -o out/cc_vec.o \
+                -I out/include/ \
+                -I out/src/
+
 .PHONY: process_source process_source_prompt
 
 process_source: \
@@ -156,6 +157,7 @@ process_source: \
 		out/src/cc_string.c \
 		out/src/cc_string.cclib.c \
 		out/src/cc_string.std.c \
+                out/src/cc_vec.c \
 		$(HEADERS)
 
 process_source_prompt:
@@ -230,6 +232,10 @@ out/src/cc_string.std.c: cc_proc_macro cc_string.std.c
 	@$(LOG) PROC cc_string.std.c
 	@./cc_proc_macro cc_string.std.c out/src/cc_string.std.c
 
+out/src/cc_vec.c: cc_proc_macro cc_vec.c
+	@$(LOG) PROC cc_vec.c    
+	@./cc_proc_macro cc_vec.c out/src/cc_vec.c
+
 out/include/cc_alloc.h: cc_proc_macro cc_alloc.h
 	@$(LOG) PROC cc_alloc.h
 	@./cc_proc_macro cc_alloc.h out/include/cc_alloc.h
@@ -276,6 +282,7 @@ out/include/cc_string.h: cc_proc_macro cc_string.h
 out/include/cc_vec.h: cc_proc_macro cc_vec.h
 	@$(LOG) PROC cc_vec.h
 	@./cc_proc_macro cc_vec.h out/include/cc_vec.h
+
 
 .PHONY: cfg cfg_prompt
 cfg: cfg_prompt out/include/cfg.h

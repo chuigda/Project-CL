@@ -17,7 +17,7 @@ typedef CCLIB_SSIZE_TYPE CCTY(cc_ssize);
 
 #define CC_VPTR_ADD(ptr, delta) ((void *)((CCTY(cc_size))(ptr) + (CCTY(cc_size))(delta)))
 #define CC_VPTR_SUB(ptr, delta) ((void *)((CCTY(cc_size))(ptr) - (CCTY(cc_size))(delta)))
-#define CC_VPTR_DIFF(x, y) (CCTY(cc_ssize)(x) - CCTY(cc_ssize)(y))
+#define CC_VPTR_DIFF(x, y) ((CCTY(cc_ssize))(x) - (CCTY(cc_ssize))(y))
 
 #ifndef NULL
 #   define NULL ((void*)0)
