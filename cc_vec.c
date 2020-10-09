@@ -5,7 +5,7 @@
 
 static CC_FAST_PATH void 
 _cc_vec_grow(CCTY(cc_vec) * vec) {
-    CCTY(cc_size) length = CC_VPTR_DIFF(vec->_end   - vec->_start);
+    CCTY(cc_size) length = CC_VPTR_DIFF(vec->_end, vec->_start);
     void * _start = CCFN(cc_realloc)(vec, length, length * 2);
     CC_ASSUME(_start != NULL);
     vec->_start = _start;
@@ -49,7 +49,7 @@ CCFN(cc_vec_push_front) (CCTY(cc_vec) *vec, const void *data) {
     CC_ASSUME(vec->_usage != vec->_end);
     CCFN(cc_memmove)(CC_VPTR_ADD(vec->_start, vec->_elem_size),
                     vec->_start,
-                    CC_VPTR_DIFF(vec->_usage - vec->_start));
+                    CC_VPTR_DIFF(vec->_usage, vec->_start));
     CCFN(cc_memcpy)(vec->_start, data, vec->_elem_size);
     vec->_usage = CC_VPTR_ADD(vec->_usage, vec->_elem_size);
 }
