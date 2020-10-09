@@ -1,4 +1,4 @@
-#include "cc_alloc.c"
+#include "cc_alloc.h"
 
 #if CCLIB_ALLOC == CC_FEAT_DISABLED
 #elif CCLIB_ALLOC == CC_FEAT_USE_STD
