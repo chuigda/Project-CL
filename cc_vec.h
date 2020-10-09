@@ -31,10 +31,10 @@ CCFN(cc_vec_push_back) (CCTY(cc_vec) *vec, const void *data);
 void
 CCFN(cc_vec_push_front) (CCTY(cc_vec) *vec, const void *data);
 
-void*
+void
 CCFN(cc_vec_pop_back) (CCTY(cc_vec) *vec);
 
-void*
+void
 CCFN(cc_vec_pop_front) (CCTY(cc_vec) *vec);
 
 void*
@@ -64,6 +64,9 @@ CCFN(cc_vec_len) (const CCTY(cc_vec) *vec);
 
 CCTY(cc_size)
 CCFN(cc_vec_size) (const CCTY(cc_vec) *vec);
+
+void
+CCFN(cc_vec_shrink) (CCTY(cc_vec) *vec);
 
 #ifdef __cplusplus
 } /* extern "C" */
