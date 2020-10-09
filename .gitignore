@@ -14,6 +14,10 @@ cclib.cxxflags
 cclib.creator
 cclib.creator.user
 
+# Generated makefile
+makefile
+makefile.win
+
 # Compiler outputs
 *.o
 *.out
@@ -23,6 +27,14 @@ cclib.creator.user
 *.lib
 *.exe
 *.h.gch
+cc_proc_macro
+cc_config
+cc_proc_macro.exe
+cc_config.exe
+out/
+
+# VIM backups
+*~
 
 # IDEA garbage
 .idea/

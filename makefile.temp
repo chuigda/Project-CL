@@ -1,0 +1,330 @@
+WARNINGS := -Wall -Wextra -Wc++-compat
+LOG := sh -c 'printf "\\t$$0\\t$$1\\n"' 
+
+HEADERS := \
+		out/include/cc_alloc.h \
+		out/include/cc_assert.h \
+		out/include/cc_defs.h \
+		out/include/cc_disp.h \
+		out/include/cc_inttypes.h \
+		out/include/cc_inttypes.user.h \
+		out/include/cc_list.h \
+		out/include/cc_panic.h \
+		out/include/cc_string.h \
+		out/include/cc_vec.h
+
+CFG_HEADER := \
+		out/include/cfg.h
+
+OBJECTS := \
+		out/cc_alloc.o \
+		out/cc_assert.o \
+		out/cc_disp.o \
+		out/cc_panic.o \
+		out/cc_string.o
+
+.PHONY: all
+all: \
+		out_dir \
+		proc_macro_expander \
+		configurator \
+		process_source \
+		cfg \
+		objects \
+		libs
+
+.PHONY: clean
+clean:
+	@$(LOG) RM out/
+	@rm -rf out/
+	@$(LOG) RM cc_config
+	@rm -f cc_config
+	@$(LOG) RM cc_proc_macro
+	@rm -f cc_proc_macro
+
+.PHONY: libs
+libs: staticlib dynamiclib
+
+.PHONY: staticlib staticlib_prompt
+staticlib: staticlib_prompt out/lib/libcclib.a
+
+staticlib_prompt:
+	@echo "Building static library"
+
+out/lib/libcclib.a: $(OBJECTS)
+	@$(LOG) AR out/lib/libcclib.a
+	@$(AR) -rcs out/lib/libcclib.a \
+		out/cc_alloc.o \
+		out/cc_assert.o \
+		out/cc_disp.o \
+		out/cc_panic.o \
+		out/cc_string.o
+	@$(LOG) CHMOD out/lib/libcclib.a
+	@chmod a+x out/lib/libcclib.a
+
+.PHONY: dynamiclib dynamiclib_prompt
+
+dynamiclib: dynamiclib_prompt out/lib/libcclib.so
+
+dynamiclib_prompt:
+	@echo "Building dynamic library"
+
+out/lib/libcclib.so: $(OBJECTS)
+	@$(LOG) LINK out/lib/libcclib.so
+	@$(CC) -shared -o out/lib/libcclib.so \
+		out/cc_alloc.o \
+		out/cc_assert.o \
+		out/cc_disp.o \
+		out/cc_panic.o \
+		out/cc_string.o
+
+.PHONY: objects objects_prompt
+objects: objects_prompt $(OBJECTS)
+
+objects_prompt:
+	@echo "Compiling source"
+
+out/cc_alloc.o: $(HEADERS) $(CFG_HEADER)\
+		out/src/cc_alloc.c \
+		out/src/cc_alloc.cclib.c \
+		out/src/cc_alloc.std.c \
+		out/src/cc_alloc.user.c
+	@$(LOG) CC out/src/cc_alloc.c
+	@$(CC) $(CFLAGS) $(WARNINGS) \
+		out/src/cc_alloc.c \
+		-c -fPIC \
+		-o out/cc_alloc.o \
+		-I out/include/ \
+		-I out/src/
+
+out/cc_assert.o: $(HEADERS) $(CFG_HEADER) out/src/cc_assert.c
+	@$(LOG) CC out/src/cc_assert.c
+	@$(CC) $(CFLAGS) $(WARNINGS) \
+		out/src/cc_assert.c \
+		-c -fPIC \
+		-o out/cc_assert.o \
+		-I out/include/ \
+		-I out/src/
+
+out/cc_disp.o: $(HEADERS) $(CFG_HEADER) \
+		out/src/cc_disp.c \
+		out/src/cc_disp.user.c
+	@$(LOG) CC out/src/cc_disp.c
+	@$(CC) $(CFLAGS) $(WARNINGS) \
+		out/src/cc_disp.c \
+		-c -fPIC \
+		-o out/cc_disp.o \
+		-I out/include/ \
+		-I out/src/
+
+out/cc_panic.o: $(HEADERS) $(CFG_HEADER) \
+		out/src/cc_panic.c \
+		out/src/cc_panic.user.c
+	@$(LOG) CC out/src/cc_panic.c
+	@$(CC) $(CFLAGS) $(WARNINGS) \
+		out/src/cc_panic.c \
+		-c -fPIC \
+		-o out/cc_panic.o \
+		-I out/include/ \
+		-I out/src/
+
+out/cc_string.o: $(HEADERS) $(CFG_HEADER) \
+		out/src/cc_string.c \
+		out/src/cc_string.cclib.c \
+		out/src/cc_string.std.c
+	@$(LOG) CC out/src/cc_string.c
+	@$(CC) $(CFLAGS) $(WARNINGS) \
+		out/src/cc_string.c \
+		-c -fPIC \
+		-o out/cc_string.o \
+		-I out/include/ \
+		-I out/src/
+
+.PHONY: process_source process_source_prompt
+
+process_source: \
+		process_source_prompt \
+		out/src/cc_alloc.c \
+		out/src/cc_alloc.cclib.c \
+		out/src/cc_alloc.std.c \
+		out/src/cc_alloc.user.c \
+		out/src/cc_assert.c \
+		out/src/cc_disp.c \
+		out/src/cc_disp.user.c \
+		out/src/cc_panic.c \
+		out/src/cc_panic.user.c \
+		out/src/cc_string.c \
+		out/src/cc_string.cclib.c \
+		out/src/cc_string.std.c \
+		$(HEADERS)
+
+process_source_prompt:
+	@echo "Expanding procedural macro"
+
+out/src/cc_alloc.c: cc_proc_macro cc_alloc.c
+	@$(LOG) PROC cc_alloc.c
+	@./cc_proc_macro cc_alloc.c out/src/cc_alloc.c
+
+out/src/cc_alloc.cclib.c: cc_proc_macro cc_alloc.cclib.c
+	@$(LOG) PROC cc_alloc.cclib.c
+	@./cc_proc_macro cc_alloc.cclib.c out/src/cc_alloc.cclib.c
+
+out/src/cc_alloc.std.c: cc_proc_macro cc_alloc.std.c
+	@$(LOG) PROC cc_alloc.std.c
+	@./cc_proc_macro cc_alloc.std.c out/src/cc_alloc.std.c
+
+out/src/cc_alloc.user.c: cc_proc_macro
+	@if [ -f cc_alloc.user.c ]; then \
+		$(LOG) PROC cc_alloc.user.c; \
+		./cc_proc_macro \
+			cc_alloc.user.c \
+			out/src/cc_alloc.user.c; \
+	else \
+		$(LOG) TOUCH out/src/cc_alloc.user.c; \
+		touch out/src/cc_alloc.user.c; \
+	fi;
+
+out/src/cc_assert.c: cc_proc_macro cc_assert.c
+	@$(LOG) PROC cc_assert.c
+	@./cc_proc_macro cc_assert.c out/src/cc_assert.c
+
+out/src/cc_disp.c: cc_proc_macro cc_disp.c
+	@$(LOG) PROC cc_disp.c
+	@./cc_proc_macro cc_disp.c out/src/cc_disp.c
+
+out/src/cc_disp.user.c: cc_proc_macro
+	@if [ -f cc_disp.user.c ]; then \
+		$(LOG) PROC cc_disp.user.c; \
+		./cc_proc_macro \
+			cc_disp.user.c \
+			out/src/cc_disp.user.c; \
+	else \
+		$(LOG) TOUCH out/src/cc_disp.user.c; \
+		touch out/src/cc_disp.user.c; \
+	fi;
+
+out/src/cc_panic.c: cc_proc_macro cc_panic.c
+	@$(LOG) PROC cc_panic.c
+	@./cc_proc_macro cc_panic.c out/src/cc_panic.c
+
+out/src/cc_panic.user.c: cc_proc_macro
+	@if [ -f cc_panic.user.c ]; then \
+		$(LOG) PROC cc_panic.user.c; \
+		./cc_proc_macro \
+			cc_panic.user.c \
+			out/src/cc_panic.user.c; \
+	else \
+		$(LOG) TOUCH out/src/cc_panic.user.c; \
+		touch out/src/cc_panic.user.c; \
+	fi;
+
+out/src/cc_string.c: cc_proc_macro cc_string.c
+	@$(LOG) PROC cc_string.c
+	@./cc_proc_macro cc_string.c out/src/cc_string.c
+
+out/src/cc_string.cclib.c: cc_proc_macro cc_string.cclib.c
+	@$(LOG) PROC cc_string.cclib.c
+	@./cc_proc_macro cc_string.cclib.c out/src/cc_string.cclib.c
+
+out/src/cc_string.std.c: cc_proc_macro cc_string.std.c
+	@$(LOG) PROC cc_string.std.c
+	@./cc_proc_macro cc_string.std.c out/src/cc_string.std.c
+
+out/include/cc_alloc.h: cc_proc_macro cc_alloc.h
+	@$(LOG) PROC cc_alloc.h
+	@./cc_proc_macro cc_alloc.h out/include/cc_alloc.h
+
+out/include/cc_assert.h: cc_proc_macro cc_assert.h
+	@$(LOG) PROC cc_assert.h
+	@./cc_proc_macro cc_assert.h out/include/cc_assert.h
+
+out/include/cc_defs.h: cc_proc_macro cc_defs.h
+	@$(LOG) PROC cc_defs.h
+	@./cc_proc_macro cc_defs.h out/include/cc_defs.h
+
+out/include/cc_disp.h: cc_proc_macro cc_disp.h
+	@$(LOG) PROC cc_disp.h
+	@./cc_proc_macro cc_disp.h out/include/cc_disp.h
+
+out/include/cc_inttypes.h: cc_proc_macro cc_inttypes.h
+	@$(LOG) PROC cc_inttypes.h
+	@./cc_proc_macro cc_inttypes.h out/include/cc_inttypes.h
+
+out/include/cc_inttypes.user.h: cc_proc_macro
+	@if [ -f cc_inttypes.user.h ]; then \
+		$(LOG) PROC cc_inttypes.user.h; \
+		./cc_proc_macro \
+			cc_inttypes.user.h \
+			out/include/cc_inttypes.user.h; \
+	else \
+		$(LOG) TOUCH out/src/cc_inttypes.user.c; \
+		touch out/include/cc_inttypes.user.h; \
+	fi;
+
+out/include/cc_list.h: cc_proc_macro cc_list.h
+	@$(LOG) PROC cc_list.h
+	@./cc_proc_macro cc_list.h out/include/cc_list.h
+
+out/include/cc_panic.h: cc_proc_macro cc_panic.h
+	@$(LOG) PROC cc_panic.h
+	@./cc_proc_macro cc_panic.h out/include/cc_panic.h
+
+out/include/cc_string.h: cc_proc_macro cc_string.h
+	@$(LOG) PROC cc_string.h
+	@./cc_proc_macro cc_string.h out/include/cc_string.h
+
+out/include/cc_vec.h: cc_proc_macro cc_vec.h
+	@$(LOG) PROC cc_vec.h
+	@./cc_proc_macro cc_vec.h out/include/cc_vec.h
+
+.PHONY: cfg cfg_prompt
+cfg: cfg_prompt out/include/cfg.h
+
+cfg_prompt:
+	@echo "Creating configuration"
+
+out/include/cfg.h: cc_config
+	@if [ -f cfg.h ]; then \
+		$(LOG) SKIP CFG; \
+	else \
+		$(LOG) CFG; \
+		./cc_config; \
+	fi;
+	@$(LOG) CP cfg.h;
+	@cp cfg.h out/include/cfg.h; \
+
+.PHONY: out_dir out_dir_prompt
+out_dir: out_dir_prompt out/
+
+out_dir_prompt:
+	@echo "Creating output directory"
+
+out/:
+	@$(LOG) MKDIR out/
+	@mkdir -p out/
+	@$(LOG) MKDIR out/include/
+	@mkdir -p out/include
+	@$(LOG) MKDIR out/src
+	@mkdir -p out/src
+	@$(LOG) MKDIR out/lib
+	@mkdir -p out/lib
+
+.PHONY: proc_macro_expander proc_macro_expander_prompt
+proc_macro_expander: proc_macro_expander_prompt cc_proc_macro
+
+proc_macro_expander_prompt:
+	@echo "Building procedural macro expander"
+
+cc_proc_macro: cc_proc_macro.c
+	@$(LOG) BUILD cc_proc_macro.c
+	@$(CC) cc_proc_macro.c -Wall -Wextra -O2 -o cc_proc_macro
+
+.PHONY: configurator configurator_prompt
+configurator: configurator_prompt cc_config
+
+configurator_prompt:
+	@echo "Building configurator"
+
+cc_config: cc_config.c
+	@$(LOG) BUILD cc_config.c
+	@$(CC) cc_config.c -Wall -Wextra -O2 -o cc_config

@@ -8,6 +8,7 @@ void* CCFN(cc_alloc) (CCTY(cc_size) size) {
 void* CCFN(cc_realloc) (void *ptr,
                         CCTY(cc_size) old_size,
                         CCTY(cc_size) new_size) {
+    (void)old_size;
     return realloc(ptr, (size_t)new_size);
 }
 
