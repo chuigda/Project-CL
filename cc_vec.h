@@ -11,8 +11,12 @@
 extern "C" {
 #endif
 
+#define CC_VEC_INIT_SIZE 8
 typedef struct st_cc_vec {
-    /* TODO unimplemented */
+    void * _start;           // the pointer to the begining of the memory area
+    void * _usage;           // the pointer to the position right after the last element
+    void * _end;             // the pointer to the end of the memory area
+    CCTY(cc_size) _elem_size;// size of a single element
 } CCTY(cc_vec);
 
 void
