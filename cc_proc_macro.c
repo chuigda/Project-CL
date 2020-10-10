@@ -22,14 +22,58 @@ static int ret_value = 0;
 static const char *error_reason = NULL;
 
 /* Type renaming rule, left to user to finish. Default to strcpy. */
+/* Example: rename underscore to big camel case
+
+    static int i, j, underscore;
+    #define CCTY_RENAME(DST, SRC) \
+        { \
+            i = 0; \
+            j = 0; \
+            underscore = 1; \
+            while ((SRC)[i] != 0) { \
+                if ((SRC)[i] == '_') { \
+                    underscore = 1; \
+                    i++; \
+                } else if (underscore) { \
+                    (DST)[j++] = toupper((int)(SRC)[i++]); \
+                    underscore = 0; \
+                } else { \
+                    (DST)[j++] = (SRC)[i++]; \
+                    underscore = 0; \
+                } \
+            } \
+        }
+ */
 #define CCTY_RENAME(DST, SRC) \
-    {\
+    { \
         strcpy((DST), (SRC)); \
     }
 
 /* Function renaming rule, left to user to finish. Default to strcpy. */
+/* Example: rename underscore to camel case
+
+    static int i, j, underscore;
+    #define CCFN_RENAME(DST, SRC) \
+        { \
+            i = 0; \
+            j = 0; \
+            underscore = 0; \
+            while ((SRC)[i] != 0) { \
+                if ((SRC)[i] == '_') { \
+                    underscore = 1; \
+                    i++; \
+                } else if (underscore) { \
+                    (DST)[j++] = toupper((int)(SRC)[i++]); \
+                    underscore = 0; \
+                } else { \
+                    (DST)[j++] = (SRC)[i++]; \
+                    underscore = 0; \
+                } \
+            } \
+        }
+*/
 #define CCFN_RENAME(DST, SRC) \
-    {\
+    { \
         strcpy((DST), (SRC)); \
     }
 
@@ -200,7 +244,7 @@ parse_string:
     goto parse_one_token;
 
 parse_number:
-    while ((int)isdigit(input_buffer[idx])) {
+    while (isdigit((int)input_buffer[idx])) {
         output_buffer[out_idx++] = input_buffer[idx++];
     }
     goto parse_one_token;
