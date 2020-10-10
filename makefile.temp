@@ -22,7 +22,7 @@ OBJECTS := \
 		out/cc_disp.o \
 		out/cc_panic.o \
 		out/cc_string.o \
-                out/cc_vec.o
+		out/cc_vec.o
 
 .PHONY: all
 all: \
@@ -136,10 +136,10 @@ out/cc_vec.o: $(HEADERS) $(CFG_HEADER) \
 	@$(LOG) CC out/src/cc_vec.c
 	@$(CC) $(CFLAGS) $(WARNINGS) \
 		out/src/cc_vec.c \
-                -c -fPIC \
-                -o out/cc_vec.o \
-                -I out/include/ \
-                -I out/src/
+		-c -fPIC \
+		-o out/cc_vec.o \
+		-I out/include/ \
+		-I out/src/
 
 .PHONY: process_source process_source_prompt
 
@@ -157,7 +157,7 @@ process_source: \
 		out/src/cc_string.c \
 		out/src/cc_string.cclib.c \
 		out/src/cc_string.std.c \
-                out/src/cc_vec.c \
+		out/src/cc_vec.c \
 		$(HEADERS)
 
 process_source_prompt:
@@ -233,7 +233,7 @@ out/src/cc_string.std.c: cc_proc_macro cc_string.std.c
 	@./cc_proc_macro cc_string.std.c out/src/cc_string.std.c
 
 out/src/cc_vec.c: cc_proc_macro cc_vec.c
-	@$(LOG) PROC cc_vec.c    
+	@$(LOG) PROC cc_vec.c
 	@./cc_proc_macro cc_vec.c out/src/cc_vec.c
 
 out/include/cc_alloc.h: cc_proc_macro cc_alloc.h

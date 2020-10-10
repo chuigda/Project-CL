@@ -15,8 +15,10 @@ typedef CCLIB_SIZE_TYPE CCTY(cc_size);
 typedef CCLIB_SSIZE_TYPE CCTY(cc_ssize);
 #endif
 
-#define CC_VPTR_ADD(ptr, delta) ((void *)((CCTY(cc_size))(ptr) + (CCTY(cc_size))(delta)))
-#define CC_VPTR_SUB(ptr, delta) ((void *)((CCTY(cc_size))(ptr) - (CCTY(cc_size))(delta)))
+#define CC_VPTR_ADD(ptr, delta) \
+    ((void *)((CCTY(cc_size))(ptr) + (CCTY(cc_size))(delta)))
+#define CC_VPTR_SUB(ptr, delta) \
+    ((void *)((CCTY(cc_size))(ptr) - (CCTY(cc_size))(delta)))
 #define CC_VPTR_DIFF(x, y) ((CCTY(cc_ssize))(x) - (CCTY(cc_ssize))(y))
 
 #ifndef NULL
@@ -42,14 +44,14 @@ typedef CCLIB_SSIZE_TYPE CCTY(cc_ssize);
 #   define CC_SLOW_PATH        __declspec(noinline)
 #   define CC_UNLIKELY         !!(x)
 #   define CC_LIKELY           !!(x)
-#   define CC_PURE             // do nothing
-#   define CC_UNREACHABLE_HINT // do nothing
+#   define CC_PURE             /* do nothing */
+#   define CC_UNREACHABLE_HINT /* do nothing */
 #else
 #   define CC_FAST_PATH        inline
-#   define CC_SLOW_PATH        // do nothing
+#   define CC_SLOW_PATH        /* do nothing */
 #   define CC_UNLIKELY(x)      !!(x)
 #   define CC_LIKELY(x)        !!(x)
-#   define CC_PURE             // do nothing 
+#   define CC_PURE             /* do nothing */ 
 #   define CC_UNREACHABLE_HINT 
 #endif
 
