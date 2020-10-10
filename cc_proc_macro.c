@@ -104,6 +104,12 @@ line_feed:
     idx = 0;
     out_idx = 0;
 
+    if (strstr(input_buffer, "PROC_MACRO_FALLBACK")) {
+        strcpy(output_buffer, "/* PROC_MACRO_FALLBACK */\n");
+        out_idx = 4095;
+        goto next_line;
+    }
+
 parse_one_token:
     if (input_buffer[idx] == '\0') {
         goto next_line;

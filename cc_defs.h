@@ -3,8 +3,8 @@
 
 #include "cfg.h"
 
-#define CCFN(X_SOME_FN) X_SOME_FN
-#define CCTY(X_SOME_TYPE) X_SOME_TYPE
+#define CCFN(PROC_MACRO_FALLBACK) PROC_MACRO_FALLBACK
+#define CCTY(PROC_MACRO_FALLBACK) PROC_MACRO_FALLBACK
 
 #if !defined(CCLIB_SIZE_TYPE) && !defined(CCLIB_SSIZE_TYPE)
 #   include <stddef.h>
