@@ -3,6 +3,8 @@
 #include "cc_alloc.h"
 #include "cc_string.h"
 
+#if CCLIB_DS_VEC != CC_FEAT_DISABLED
+
 static CC_FAST_PATH void 
 _cc_vec_grow(CCTY(cc_vec) * vec) {
     CCTY(cc_size) length = CC_VPTR_DIFF(vec->_end, vec->_start);
@@ -157,4 +159,4 @@ CCFN(cc_vec_size) (const CCTY(cc_vec) *vec) {
     return CC_VPTR_DIFF(vec->_usage, vec->_start) / vec->_elem_size;
 }
 
-
+#endif

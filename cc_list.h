@@ -12,11 +12,13 @@ extern "C" {
 #endif
 
 typedef struct st_cc_list {
-    /* TODO unimplemented */
+    void *p1;
+    void *p2;
+    CCTY(cc_size) elem_size;
 } CCTY(cc_list);
 
 typedef struct st_cc_list_iter {
-    /* TODO unimplemented */
+    void *node;
 } CCTY(cc_list_iter);
 
 void
@@ -31,10 +33,10 @@ CCFN(cc_list_push_back) (CCTY(cc_list) *list, const void *data);
 void
 CCFN(cc_list_push_front) (CCTY(cc_list) *list, const void *data);
 
-void*
+void
 CCFN(cc_list_pop_back) (CCTY(cc_list) *list);
 
-void*
+void
 CCFN(cc_list_pop_front) (CCTY(cc_list) *list);
 
 void*
@@ -49,6 +51,9 @@ CCFN(cc_list_len) (const CCTY(cc_list) *list);
 CCTY(cc_size)
 CCFN(cc_list_size) (const CCTY(cc_list) *list);
 
+_Bool
+CCFN(cc_list_empty) (const CCTY(cc_list) *list);
+
 CCTY(cc_list_iter)
 CCFN(cc_list_begin) (const CCTY(cc_list) *list);
 
@@ -57,7 +62,8 @@ CCFN(cc_list_end) (const CCTY(cc_list) *list);
 
 void
 CCFN(cc_list_insert) (const CCTY(cc_list) *list,
-                      CCTY(cc_list_iter) pos);
+                      CCTY(cc_list_iter) pos,
+                      const void *data);
 
 void
 CCFN(cc_list_remove) (const CCTY(cc_list) *list,

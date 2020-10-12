@@ -15,6 +15,7 @@ typedef CCLIB_SIZE_TYPE CCTY(cc_size);
 typedef CCLIB_SSIZE_TYPE CCTY(cc_ssize);
 #endif
 
+#define CC_OFFSETOF(a,b) ((CCTY(cc_ssize))(&(((a*)(0))->b)))
 #define CC_VPTR_ADD(ptr, delta) \
     ((void *)((CCTY(cc_size))(ptr) + (CCTY(cc_size))(delta)))
 #define CC_VPTR_SUB(ptr, delta) \

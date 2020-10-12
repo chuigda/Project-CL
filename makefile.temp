@@ -20,6 +20,7 @@ OBJECTS := \
 		out/cc_alloc.o \
 		out/cc_assert.o \
 		out/cc_disp.o \
+		out/cc_list.o \
 		out/cc_panic.o \
 		out/cc_string.o \
 		out/cc_vec.o
@@ -108,6 +109,16 @@ out/cc_disp.o: $(HEADERS) $(CFG_HEADER) \
 		-I out/include/ \
 		-I out/src/
 
+out/cc_list.o: $(HEADERS) $(CFG_HEADER) \
+		out/src/cc_list.c
+	@$(LOG) CC out/src/cc_list.c
+	@$(CC) $(CFLAGS) $(WARNINGS) \
+		out/src/cc_list.c \
+		-c -fPIC \
+		-o out/cc_list.o \
+		-I out/include/ \
+		-I out/src/
+
 out/cc_panic.o: $(HEADERS) $(CFG_HEADER) \
 		out/src/cc_panic.c \
 		out/src/cc_panic.user.c
@@ -152,6 +163,7 @@ process_source: \
 		out/src/cc_assert.c \
 		out/src/cc_disp.c \
 		out/src/cc_disp.user.c \
+		out/src/cc_list.c \
 		out/src/cc_panic.c \
 		out/src/cc_panic.user.c \
 		out/src/cc_string.c \
@@ -204,6 +216,10 @@ out/src/cc_disp.user.c: cc_proc_macro
 		$(LOG) TOUCH out/src/cc_disp.user.c; \
 		touch out/src/cc_disp.user.c; \
 	fi;
+
+out/src/cc_list.c: cc_proc_macro cc_list.c
+	@$(LOG) PROC cc_list.c
+	@./cc_proc_macro cc_list.c out/src/cc_list.c
 
 out/src/cc_panic.c: cc_proc_macro cc_panic.c
 	@$(LOG) PROC cc_panic.c
