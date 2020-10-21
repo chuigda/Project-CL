@@ -6,10 +6,10 @@ CCFN(cc_memchr) (const void *str, int c, CCTY(cc_size) n);
 int
 CCFN(cc_memcmp) (const void *str1, const void *str2, CCTY(cc_size) n);
 
-CCTY(cc_size)
+void
 CCFN(cc_memcpy) (void *dest, const void *from, CCTY(cc_size) n);
 
-CCTY(cc_ssize)
+void
 CCFN(cc_memmove) (void *dest, const void *from, CCTY(cc_size) n);
 
 CCTY(cc_size)
