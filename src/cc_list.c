@@ -258,7 +258,7 @@ CCFN(cc_list_find_value) (const CC_LIST *list,
     for (list_node *node = head_node->next;
          node != head_node;
          node = node->next) {
-        if (CC_MEMCMP (node->data, value, elem_size) == 0) {
+        if (CC_MEMCMP(node->data, value, elem_size) == 0) {
             CC_LIST_ITER ret;
             ret.node = node;
             return ret;
@@ -279,7 +279,7 @@ CCFN(cc_list_iter_find) (CC_LIST *list,
     (void)list;
     for(; !CCFN(cc_list_iter_eq) (first, last);
         first = CCFN(cc_list_iter_next) (first)) {
-        if (cmp(CCFN(cc_list_iter_deref(first)), value)) {
+        if (cmp(CCFN(cc_list_iter_deref) (first), value)) {
             return first;
         }
     }
@@ -294,9 +294,9 @@ CCFN(cc_list_iter_find_value) (CC_LIST *list,
     CC_SIZE elem_size = list->elem_size;
     for(; !CCFN(cc_list_iter_eq) (first, last);
         first = CCFN(cc_list_iter_next) (first)) {
-        if (CC_MEMCMP (CCFN(cc_list_iter_deref(first)),
-                       value,
-                       elem_size) == 0) {
+        if (CC_MEMCMP(CCFN(cc_list_iter_deref) (first),
+                      value,
+                      elem_size) == 0) {
             return first;
         }
     }

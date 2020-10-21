@@ -13,10 +13,10 @@ extern "C" {
 
 #define CC_VEC_INIT_SIZE 8
 typedef struct st_cc_vec {
-    void *_start;
-    void *_usage;
-    void *_end;
-    CCTY(cc_size) _elem_size;
+    void *start;
+    void *usage;
+    void *end;
+    CCTY(cc_size) elem_size;
 } CCTY(cc_vec);
 
 void
