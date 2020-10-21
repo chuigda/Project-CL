@@ -168,6 +168,15 @@ CCFN(cc_list_insert) (const CCTY(cc_list) *list,
 }
 
 void
+CCFN(cc_list_insert_after) (const CCTY(cc_list) *list,
+                            CCTY(cc_list_iter) pos,
+                            const void *data) {
+    CCFN(cc_list_insert) (list,
+                          CCFN(cc_list_iter_next) (pos),
+                          data);
+}
+
+void
 CCFN(cc_list_remove) (const CCTY(cc_list) *list,
                       CCTY(cc_list_iter) pos) {
     (void)list;
@@ -214,6 +223,12 @@ CCFN(cc_list_iter_next) (CCTY(cc_list_iter) iter) {
     list_node *node = (list_node*)iter.node;
     ret.node = node->next;
     return ret;
+}
+
+_Bool
+CCFN(cc_list_iter_eq) (CCTY(cc_list_iter) iter1,
+                       CCTY(cc_list_iter) iter2) {
+    return iter1.node == iter2.node;
 }
 
 #endif

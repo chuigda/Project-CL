@@ -1,5 +1,5 @@
 WARNINGS := -Wall -Wextra -Wc++-compat
-LOG := sh -c 'printf "\\t$$0\\t$$1\\n"' 
+LOG := sh -c 'printf "\\t$$0\\t$$1\\n"'
 
 HEADERS := \
 		out/include/cc_alloc.h \

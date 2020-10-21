@@ -66,6 +66,11 @@ CCFN(cc_list_insert) (const CCTY(cc_list) *list,
                       const void *data);
 
 void
+CCFN(cc_list_insert_after) (const CCTY(cc_list) *list,
+                            CCTY(cc_list_iter) pos,
+                            const void *data);
+
+void
 CCFN(cc_list_remove) (const CCTY(cc_list) *list,
                       CCTY(cc_list_iter) pos);
 
@@ -82,6 +87,10 @@ CCFN(cc_list_iter_prev) (CCTY(cc_list_iter) iter);
 
 CCTY(cc_list_iter)
 CCFN(cc_list_iter_next) (CCTY(cc_list_iter) iter);
+
+_Bool
+CCFN(cc_list_iter_eq) (CCTY(cc_list_iter) iter1,
+                       CCTY(cc_list_iter) iter2);
 
 #ifdef __cplusplus
 } /* extern "C" */
