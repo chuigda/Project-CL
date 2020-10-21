@@ -92,6 +92,28 @@ _Bool
 CCFN(cc_list_iter_eq) (CCTY(cc_list_iter) iter1,
                        CCTY(cc_list_iter) iter2);
 
+CCTY(cc_list_iter)
+CCFN(cc_list_find) (const CCTY(cc_list) *list,
+                    const void *value,
+                    _Bool (*cmp)(const void*, const void*));
+
+CCTY(cc_list_iter)
+CCFN(cc_list_find_value) (const CCTY(cc_list) *list,
+                          const void *value);
+
+CCTY(cc_list_iter)
+CCFN(cc_list_iter_find) (CCTY(cc_list) *list,
+                         CCTY(cc_list_iter) first,
+                         CCTY(cc_list_iter) last,
+                         const void *value,
+                         _Bool (*cmp)(const void*, const void*));
+
+CCTY(cc_list_iter)
+CCFN(cc_list_iter_find_value) (CCTY(cc_list) *list,
+                               CCTY(cc_list_iter) first,
+                               CCTY(cc_list_iter) last,
+                               const void *value);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

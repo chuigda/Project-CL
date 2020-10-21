@@ -10,12 +10,12 @@
 #define CC_UINT8 CCTY(cc_uint8)
 #define CC_SIZE CCTY(cc_size)
 #define CC_LIST CCTY(cc_list)
-
 #define CC_LIST_ITER CCTY(cc_list_iter)
 
 #define CC_ALLOC CCFN(cc_alloc)
 #define CC_FREE CCFN(cc_free)
 #define CC_MEMCPY CCFN(cc_memcpy)
+#define CC_MEMCMP CCFN(cc_memcmp)
 
 typedef struct st_list_node {
     struct st_list_node *prev;
@@ -59,7 +59,7 @@ CCFN(cc_list_push_back) (CC_LIST *list, const void *data) {
 }
 
 void
-CCFN(cc_list_push_front) (CCTY(cc_list) *list, const void *data) {
+CCFN(cc_list_push_front) (CC_LIST *list, const void *data) {
     list_node *new_node = 
         (list_node*)CC_ALLOC(sizeof(list_node) + list->elem_size);
     CC_MEMCPY (CC_VPTR_ADD(new_node, CC_OFFSETOF(list_node, data)),
@@ -74,7 +74,7 @@ CCFN(cc_list_push_front) (CCTY(cc_list) *list, const void *data) {
 }
 
 void
-CCFN(cc_list_pop_back) (CCTY(cc_list) *list) {
+CCFN(cc_list_pop_back) (CC_LIST *list) {
     CC_ASSERT(!CCFN(cc_list_empty)(list));
     
     list_node *head_node = (list_node*)list;
@@ -85,7 +85,7 @@ CCFN(cc_list_pop_back) (CCTY(cc_list) *list) {
 }
 
 void
-CCFN(cc_list_pop_front) (CCTY(cc_list) *list) {
+CCFN(cc_list_pop_front) (CC_LIST *list) {
     CC_ASSERT(!CCFN(cc_list_empty)(list));
     
     list_node *head_node = (list_node*)list;
@@ -96,7 +96,7 @@ CCFN(cc_list_pop_front) (CCTY(cc_list) *list) {
 }
 
 void*
-CCFN(cc_list_front) (const CCTY(cc_list) *list) {
+CCFN(cc_list_front) (const CC_LIST *list) {
     CC_ASSERT(!CCFN(cc_list_empty)(list));
 
     list_node *head_node = (list_node*)list;
@@ -105,7 +105,7 @@ CCFN(cc_list_front) (const CCTY(cc_list) *list) {
 }
 
 void*
-CCFN(cc_list_back) (const CCTY(cc_list) *list) {
+CCFN(cc_list_back) (const CC_LIST *list) {
     CC_ASSERT(!CCFN(cc_list_empty)(list));
     
     list_node *head_node = (list_node*)list;
@@ -113,14 +113,14 @@ CCFN(cc_list_back) (const CCTY(cc_list) *list) {
     return CC_VPTR_ADD(back_node, CC_OFFSETOF(list_node, data));
 }
 
-CCTY(cc_size)
-CCFN(cc_list_len) (const CCTY(cc_list) *list) {
+CC_SIZE
+CCFN(cc_list_len) (const CC_LIST *list) {
     return CCFN(cc_list_size) (list);
 }
 
-CCTY(cc_size)
-CCFN(cc_list_size) (const CCTY(cc_list) *list) {
-    CCTY(cc_size) ret = 0;
+CC_SIZE
+CCFN(cc_list_size) (const CC_LIST *list) {
+    CC_SIZE ret = 0;
     list_node *head_node = (list_node*)list;
     list_node *iter_node = head_node->next;
     while (iter_node != head_node) {
@@ -131,29 +131,29 @@ CCFN(cc_list_size) (const CCTY(cc_list) *list) {
 }
 
 _Bool
-CCFN(cc_list_empty) (const CCTY(cc_list) *list) {
+CCFN(cc_list_empty) (const CC_LIST *list) {
     list_node *head_node = (list_node*)list;
     return head_node->next == head_node;
 }
 
-CCTY(cc_list_iter)
-CCFN(cc_list_begin) (const CCTY(cc_list) *list) {
-    CCTY(cc_list_iter) ret;
+CC_LIST_ITER
+CCFN(cc_list_begin) (const CC_LIST *list) {
+    CC_LIST_ITER ret;
     list_node *head_node = (list_node*)list;
     ret.node = head_node->next;
     return ret;
 }
 
-CCTY(cc_list_iter)
-CCFN(cc_list_end) (const CCTY(cc_list) *list) {
-    CCTY(cc_list_iter) ret;
+CC_LIST_ITER
+CCFN(cc_list_end) (const CC_LIST *list) {
+    CC_LIST_ITER ret;
     ret.node = (CCTY(cc_list)*)list;
     return ret;
 }
 
 void
-CCFN(cc_list_insert) (const CCTY(cc_list) *list,
-                      CCTY(cc_list_iter) pos,
+CCFN(cc_list_insert) (const CC_LIST *list,
+                      CC_LIST_ITER pos,
                       const void *data) {
     list_node *new_node = 
         (list_node*)CC_ALLOC(sizeof(list_node) + list->elem_size);
@@ -168,8 +168,8 @@ CCFN(cc_list_insert) (const CCTY(cc_list) *list,
 }
 
 void
-CCFN(cc_list_insert_after) (const CCTY(cc_list) *list,
-                            CCTY(cc_list_iter) pos,
+CCFN(cc_list_insert_after) (const CC_LIST *list,
+                            CC_LIST_ITER pos,
                             const void *data) {
     CCFN(cc_list_insert) (list,
                           CCFN(cc_list_iter_next) (pos),
@@ -177,8 +177,8 @@ CCFN(cc_list_insert_after) (const CCTY(cc_list) *list,
 }
 
 void
-CCFN(cc_list_remove) (const CCTY(cc_list) *list,
-                      CCTY(cc_list_iter) pos) {
+CCFN(cc_list_remove) (const CC_LIST *list,
+                      CC_LIST_ITER pos) {
     (void)list;
     list_node *node = (list_node*)pos.node;
     node->prev->next = node->next;
@@ -187,9 +187,9 @@ CCFN(cc_list_remove) (const CCTY(cc_list) *list,
 }
 
 void
-CCFN(cc_list_remove_range) (const CCTY(cc_list) *list,
-                            CCTY(cc_list_iter) first,
-                            CCTY(cc_list_iter) last) {
+CCFN(cc_list_remove_range) (const CC_LIST *list,
+                            CC_LIST_ITER first,
+                            CC_LIST_ITER last) {
     (void)list;
     list_node *first_node = (list_node*)first.node;
     list_node *last_node = (list_node*)last.node;
@@ -204,31 +204,103 @@ CCFN(cc_list_remove_range) (const CCTY(cc_list) *list,
 }
 
 void*
-CCFN(cc_list_iter_deref) (CCTY(cc_list_iter) iter) {
+CCFN(cc_list_iter_deref) (CC_LIST_ITER iter) {
     list_node *node = (list_node*)iter.node;
     return CC_VPTR_ADD(node, CC_OFFSETOF(list_node, data));
 }
 
-CCTY(cc_list_iter)
-CCFN(cc_list_iter_prev) (CCTY(cc_list_iter) iter) {
-    CCTY(cc_list_iter) ret;
+CC_LIST_ITER
+CCFN(cc_list_iter_prev) (CC_LIST_ITER iter) {
+    CC_LIST_ITER ret;
     list_node *node = (list_node*)iter.node;
     ret.node = node->prev;
     return ret;
 }
 
-CCTY(cc_list_iter)
-CCFN(cc_list_iter_next) (CCTY(cc_list_iter) iter) {
-    CCTY(cc_list_iter) ret;
+CC_LIST_ITER
+CCFN(cc_list_iter_next) (CC_LIST_ITER iter) {
+    CC_LIST_ITER ret;
     list_node *node = (list_node*)iter.node;
     ret.node = node->next;
     return ret;
 }
 
 _Bool
-CCFN(cc_list_iter_eq) (CCTY(cc_list_iter) iter1,
-                       CCTY(cc_list_iter) iter2) {
+CCFN(cc_list_iter_eq) (CC_LIST_ITER iter1, CC_LIST_ITER iter2) {
     return iter1.node == iter2.node;
+}
+
+CC_LIST_ITER
+CCFN(cc_list_find) (const CC_LIST *list,
+                    const void *value,
+                    _Bool (*cmp)(const void*, const void*)) {
+    list_node *head_node = (list_node*)list;
+    for (list_node *node = head_node->next;
+         node != head_node;
+         node = node->next) {
+        if (cmp(node->data, value)) {
+            CC_LIST_ITER ret;
+            ret.node = node;
+            return ret;
+        }
+    }
+
+    CC_LIST_ITER ret;
+    ret.node = head_node;
+    return ret;
+}
+
+CC_LIST_ITER
+CCFN(cc_list_find_value) (const CC_LIST *list,
+                          const void *value) {
+    CC_SIZE elem_size = list->elem_size;
+    list_node *head_node = (list_node*)list;
+    for (list_node *node = head_node->next;
+         node != head_node;
+         node = node->next) {
+        if (CC_MEMCMP (node->data, value, elem_size) == 0) {
+            CC_LIST_ITER ret;
+            ret.node = node;
+            return ret;
+        }
+    }
+
+    CC_LIST_ITER ret;
+    ret.node = head_node;
+    return ret;
+}
+
+CC_LIST_ITER
+CCFN(cc_list_iter_find) (CC_LIST *list,
+                         CC_LIST_ITER first,
+                         CC_LIST_ITER last,
+                         const void *value,
+                         _Bool (*cmp)(const void*, const void*)) {
+    (void)list;
+    for(; !CCFN(cc_list_iter_eq) (first, last);
+        first = CCFN(cc_list_iter_next) (first)) {
+        if (cmp(CCFN(cc_list_iter_deref(first)), value)) {
+            return first;
+        }
+    }
+    return first;
+}
+
+CC_LIST_ITER
+CCFN(cc_list_iter_find_value) (CC_LIST *list,
+                               CC_LIST_ITER first,
+                               CC_LIST_ITER last,
+                               const void *value) {
+    CC_SIZE elem_size = list->elem_size;
+    for(; !CCFN(cc_list_iter_eq) (first, last);
+        first = CCFN(cc_list_iter_next) (first)) {
+        if (CC_MEMCMP (CCFN(cc_list_iter_deref(first)),
+                       value,
+                       elem_size) == 0) {
+            return first;
+        }
+    }
+    return first;
 }
 
 #endif
