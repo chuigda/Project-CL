@@ -27,6 +27,28 @@ SOURCES := \
 		src/std/cc_alloc.std.c \
 		src/std/cc_string.std.c
 
+.PHNOY: test_cc_vec vg_cc_vec
+test_cc_vec: out/test/test_cc_vec
+	@$(LOG) TEST out/test/test_cc_vec
+	@./out/test/test_cc_vec
+
+vg_cc_vec: out/test/test_cc_vec
+	@$(LOG) VG out/test/test_cc_vec
+	@valgrind --leak-check=full ./out/test/test_cc_list
+
+out/test/test_cc_vec: out/test test/test_cc_vec.c $(SOURCES) $(HEADERS)
+	@$(LOG) CC test/test_cc_vec.c
+	@$(CC) $(CFLAGS) $(WARNINGS) -g \
+		src/cc_vec.c \
+		src/cc_assert.c \
+		src/cc_disp.c \
+		src/cc_panic.c \
+		src/std/cc_alloc.std.c \
+		src/std/cc_string.std.c \
+		test/test_cc_vec.c \
+		-I include/ -I out/test -I test/ \
+		-o out/test/test_cc_list
+
 .PHONY: test_cc_list vg_cc_list
 test_cc_list: out/test/test_cc_list
 	@$(LOG) TEST out/test/test_cc_list
@@ -46,14 +68,12 @@ out/test/test_cc_list: out/test test/test_cc_list.c $(SOURCES) $(HEADERS)
 		src/std/cc_alloc.std.c \
 		src/std/cc_string.std.c \
 		test/test_cc_list.c \
-		-I include/ \
-		-I out/test/ \
-		-I test/ \
+		-I include/ -I out/test/ -I test/ \
 		-o out/test/test_cc_list
 
 out/test/cfg.h: out/test cfg.temp.h
 	@$(LOG) CP cfg.temp.h
-	cp cfg.temp.h out/test/cfg.h
+	@cp cfg.temp.h out/test/cfg.h
 
 out/test:
 	@$(LOG) MKDIR out/test

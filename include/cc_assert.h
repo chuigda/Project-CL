@@ -35,7 +35,6 @@ extern void cclib_assert_impl(int value,
 } /* extern "C" */
 #endif
 
-
 #ifndef NDEBUG
 #   define CC_ASSUME(x) CC_ASSERT(x)
 #else

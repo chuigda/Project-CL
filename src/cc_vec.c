@@ -17,9 +17,10 @@
 #define CC_MEMMOVE CCFN(cc_memmove)
 
 static CC_FAST_PATH void cc_vec_grow(CC_VEC *vec) {
+    CC_ASSUME(vec->end == vec->usage);
     CC_SIZE length = CC_VPTR_DIFF(vec->end, vec->start);
     CC_SIZE target = (length == 0) ? CC_VEC_INIT_SIZE : length * 2;
-    void * start = CC_REALLOC (vec, length, target);
+    void * start = CC_REALLOC (vec->start, length, target);
     CC_ASSUME(start != NULL);
     vec->start = start;
     vec->usage = CC_VPTR_ADD(start, length);
@@ -154,14 +155,52 @@ CCFN(cc_vec_remove_n) (CC_VEC *vec, CC_SIZE first, CC_SIZE n) {
     vec->usage = CC_VPTR_SUB(vec->usage, n * vec->elem_size);
 }
 
+CCTY(cc_ssize)
+CCFN(cc_vec_find_in) (const CCTY(cc_vec) *vec,
+                      CCTY(cc_size) first,
+                      CCTY(cc_ssize) last,
+                      const void *data,
+                      _Bool (*cmp)(const void*, const void*)) {
+    if (last < 0) {
+        last = CCFN(cc_vec_len) (vec);
+    }
+    return -1;
+}
+
+CCTY(cc_ssize)
+CCFN(cc_vec_find) (const CCTY(cc_vec) *vec,
+                   const void *data,
+                   _Bool (*cmp)(const void*, const void*)) {
+    return CCFN(cc_vec_find_in) (vec,
+                                 0,
+                                 CCFN(cc_vec_len) (vec),
+                                 data,
+                                 cmp);
+}
+
+CCTY(cc_ssize)
+CCFN(cc_vec_find_value_in) (const CCTY(cc_vec) *vec,
+                            CCTY(cc_size) first,
+                            CCTY(cc_ssize) last,
+                            const void *data);
+
+CCTY(cc_ssize)
+CCFN(cc_vec_find_value) (const CCTY(cc_vec) *vec,
+                         const void *data);
+
 CC_SIZE
 CCFN(cc_vec_len) (const CC_VEC *vec) {
-    return CC_VPTR_DIFF(vec->end, vec->start) / vec->elem_size;
+    return CC_VPTR_DIFF(vec->usage, vec->start) / vec->elem_size;
 }
 
 CC_SIZE
 CCFN(cc_vec_size) (const CC_VEC *vec) {
-    return CC_VPTR_DIFF(vec->usage, vec->start) / vec->elem_size;
+    return CCFN(cc_vec_len) (vec);
+}
+
+_Bool
+CCFN(cc_vec_empty) (const CC_VEC *vec) {
+    return vec->usage == vec->start;
 }
 
 #endif

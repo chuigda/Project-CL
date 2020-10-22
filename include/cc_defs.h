@@ -56,8 +56,8 @@ typedef CCLIB_SSIZE_TYPE CCTY(cc_ssize);
 #   define CC_SLOW_PATH        /* do nothing */
 #   define CC_UNLIKELY(x)      !!(x)
 #   define CC_LIKELY(x)        !!(x)
-#   define CC_PURE             /* do nothing */ 
-#   define CC_UNREACHABLE_HINT 
+#   define CC_PURE             /* do nothing */
+#   define CC_UNREACHABLE_HINT
 #endif
 
 #define CC_UNUSED(x) ((void)(x))

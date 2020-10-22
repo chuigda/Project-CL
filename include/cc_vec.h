@@ -59,11 +59,36 @@ CCFN(cc_vec_remove_n) (CCTY(cc_vec) *vec,
                        CCTY(cc_size) first,
                        CCTY(cc_size) n);
 
+CCTY(cc_ssize)
+CCFN(cc_vec_find_in) (const CCTY(cc_vec) *vec,
+                      CCTY(cc_size) first,
+                      CCTY(cc_ssize) last,
+                      const void *data,
+                      _Bool (*cmp)(const void*, const void*));
+
+CCTY(cc_ssize)
+CCFN(cc_vec_find) (const CCTY(cc_vec) *vec,
+                   const void *data,
+                   _Bool (*cmp)(const void*, const void*));
+
+CCTY(cc_ssize)
+CCFN(cc_vec_find_value_in) (const CCTY(cc_vec) *vec,
+                            CCTY(cc_size) first,
+                            CCTY(cc_ssize) last,
+                            const void *data);
+
+CCTY(cc_ssize)
+CCFN(cc_vec_find_value) (const CCTY(cc_vec) *vec,
+                         const void *data);
+
 CCTY(cc_size)
 CCFN(cc_vec_len) (const CCTY(cc_vec) *vec);
 
 CCTY(cc_size)
 CCFN(cc_vec_size) (const CCTY(cc_vec) *vec);
+
+_Bool
+CCFN(cc_vec_empty) (const CCTY(cc_vec) *vec);
 
 void
 CCFN(cc_vec_shrink) (CCTY(cc_vec) *vec);
