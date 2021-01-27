@@ -7,7 +7,7 @@ typedef struct st_config_item {
     const char *item_description;
     const char *cmd_opt;
     const char *macro_name;
-    int default_option;
+    int enabled;
 } config_item;
 
 static config_item items[] = {
@@ -106,6 +106,8 @@ static config_item items[] = {
     }
 };
 
+#define COUNTOF(arr) (sizeof(arr) / sizeof(arr[0]))
+
 static const char *help_text = 
 "CCLib Configurator 1.0\n"
 "Iceyey Chuigda WhiteGive <icey@icey.tech>\n"
@@ -139,6 +141,11 @@ int main(int argc, const char *argv[]) {
             const char *prog_name = 
                 (argv[0] && argv[0][0]) ? argv[0] : "cc_config";
             fprintf(stderr, help_text, prog_name);
+        }
+        if (!strcmp(argv[1], "-a") || !strcmp(argv[1], "--all")) {
+            for (size_t i = 0; i < COUNTOF(items); i++) {
+                items[i].enabled = 1;
+            }
         }
     }
     return 0;
