@@ -28,6 +28,12 @@ cc_error cc_vec_reserve(cc_vec *vec, cc_size cap);
 
 void *cc_vec_at(cc_vec *vec, cc_size idx);
 
+cc_error cc_vec_push(cc_vec *vec, void *value);
+
+cc_error cc_vec_insert(cc_vec *vec, cc_size idx, void *value);
+
+cc_error cc_vec_pop(cc_vec *vec);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
