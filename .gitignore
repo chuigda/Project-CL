@@ -1,6 +1,3 @@
-# Generated configuration
-cfg.h
-
 # User's implementation files
 *.user.c
 *.user.h
