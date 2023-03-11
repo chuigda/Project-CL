@@ -6,6 +6,7 @@
 #endif
 
 #include <defs.h>
+#include <error.h>
 
 struct st_cc_vec;
 
@@ -22,6 +23,10 @@ cc_size cc_vec_size(cc_vec *vec);
 cc_size cc_vec_cap(cc_vec *vec);
 
 void cc_vec_shrink(cc_vec *vec);
+
+cc_error cc_vec_reserve(cc_vec *vec, cc_size cap);
+
+void *cc_vec_at(cc_vec *vec, cc_size idx);
 
 #ifdef __cplusplus
 extern "C" {
