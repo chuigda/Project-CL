@@ -34,6 +34,8 @@ cc_error cc_vec_insert(cc_vec *vec, cc_size idx, void *value);
 
 cc_error cc_vec_pop(cc_vec *vec);
 
+cc_error cc_vec_remove(cc_vec *vec, cc_size idx);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
