@@ -19,7 +19,7 @@ cc_vec *cc_vec_init(cc_size item_size) {
     }
 #endif
 
-    cc_vec *ret = malloc(sizeof(cc_vec));
+    cc_vec *ret = cc_alloc(sizeof(cc_vec));
     if (ret) {
         cc_memset(ret, 0, sizeof(cc_vec));
     }

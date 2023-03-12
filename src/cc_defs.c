@@ -2,6 +2,13 @@
 
 /* This file does nothing, but configuration sanity check */
 
+#if !defined(PROJECT_CL_ABORT_USE_EXTERNAL) \
+    && !defined(PROJECT_CL_ABORT_INCLUDE_IMPL) \
+    && !defined(PROJECT_CL_ABORT_USE_LIBC) \
+    && !defined(PROJECT_CL_ABORT_USE_DEAD_LOOP)
+#   error SANITY CHECK: no valid PROJECT_CL_ABORT_* suboption
+#endif
+
 #ifndef PROJECT_CL_BUILD_ALLOC
 #   ifdef PROJECT_CL_BUILD_VEC
 #       error SANITY CHECK: cannot enable VEC without ALLOC

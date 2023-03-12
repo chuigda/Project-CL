@@ -3,6 +3,14 @@
 
 #include <cc_defs.h>
 
-extern "C" void cc_abort();
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void cc_abort();
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* PROJECT_CL_CC_ABORT_H */

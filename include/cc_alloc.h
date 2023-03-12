@@ -1,7 +1,7 @@
 #ifndef PROJECT_CL_ALLOC_H
 #define PROJECT_CL_ALLOC_H
 
-#ifndef PROJECT_CL_BUILD_ALLOC
+#if !defined(PROJECT_CL_IN_BUILD) && !defined(PROJECT_CL_BUILD_ALLOC)
 #   error PROJECT_CL_BUILD_ALLOC not defined
 #endif
 

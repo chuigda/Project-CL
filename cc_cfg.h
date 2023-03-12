@@ -4,6 +4,7 @@
 /* note: this is just a piece of example configuration, if you want to 
    customise Project-CL, you need to write or generate your own one. */
 
+#define PROJECT_CL_ABORT_USE_LIBC
 #define PROJECT_CL_BUILD_ASSERT
 #define PROJECT_CL_ASSERT_USE_LIBC
 #define PROJECT_CL_MEMORY_USE_LIBC

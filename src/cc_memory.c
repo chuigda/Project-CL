@@ -1,7 +1,8 @@
 #include <cc_memory.h>
+#include <cc_assert.h>
 
 #ifdef PROJECT_CL_MEMORY_USE_LIBC
-#   include <stdlib.h>
+#   include <string.h>
 void cc_memset(void *ptr, cc_uint8 value, cc_size cnt) {
 #   ifdef PROJECT_CL_RUNTIME_CHECK
     cc_assert(ptr);
