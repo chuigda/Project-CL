@@ -1,7 +1,7 @@
 #ifndef PROJECT_CL_MEMORY_H
 #define PROJECT_CL_MEMORY_H
 
-#include <defs.h>
+#include <cc_defs.h>
 
 #ifdef __cplusplus
 extern "C" {

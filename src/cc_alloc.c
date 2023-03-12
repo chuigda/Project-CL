@@ -1,4 +1,4 @@
-#include <alloc.h>
+#include <cc_alloc.h>
 
 #if !defined(PROJECT_CL_BUILD_ALLOC)
 /* simply do nothing, not using alloc */

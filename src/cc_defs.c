@@ -1,4 +1,4 @@
-#include <defs.h>
+#include <cc_defs.h>
 
 /* This file does nothing, but configuration sanity check */
 

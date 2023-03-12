@@ -5,7 +5,7 @@
 #   error PROJECT_CL_BUILD_ALLOC not defined
 #endif
 
-#include <defs.h>
+#include <cc_defs.h>
 
 #ifdef __cplusplus
 extern "C" {

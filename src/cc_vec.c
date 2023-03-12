@@ -1,6 +1,7 @@
-#include <vec.h>
+#include <cc_alloc.h>
 #include <cc_assert.h>
-#include <memory.h>
+#include <cc_vec.h>
+#include <cc_memory.h>
 
 struct st_cc_vec {
     void *begin;

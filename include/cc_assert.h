@@ -1,7 +1,7 @@
 #ifndef PROJECT_CL_CC_ASSERT_H
 #define PROJECT_CL_CC_ASSERT_H
 
-#include <defs.h>
+#include <cc_defs.h>
 
 #if !defined(PROJECT_CL_BUILD_ASSERT) || defined(NDEBUG)
 #   define cc_assert(x)

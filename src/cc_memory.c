@@ -1,4 +1,4 @@
-#include <memory.h>
+#include <cc_memory.h>
 
 #ifdef PROJECT_CL_MEMORY_USE_LIBC
 #   include <stdlib.h>

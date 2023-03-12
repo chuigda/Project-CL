@@ -5,8 +5,8 @@
 #   error PROJECT_CL_BUILD_VEC not defined
 #endif
 
-#include <defs.h>
-#include <error.h>
+#include <cc_defs.h>
+#include <cc_error.h>
 
 struct st_cc_vec;
 
