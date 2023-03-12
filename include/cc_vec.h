@@ -1,7 +1,7 @@
 #ifndef PROJECT_CL_VEC_H
 #define PROJECT_CL_VEC_H
 
-#ifndef PROJECT_CL_BUILD_VEC
+#if !defined(PROJECT_CL_IN_BUILD) && !defined(PROJECT_CL_BUILD_VEC)
 #   error PROJECT_CL_BUILD_VEC not defined
 #endif
 

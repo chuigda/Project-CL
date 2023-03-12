@@ -1,3 +1,5 @@
+#ifdef PROJECT_CL_BUILD_VEC
+
 #include <cc_alloc.h>
 #include <cc_assert.h>
 #include <cc_vec.h>
@@ -25,3 +27,5 @@ cc_vec *cc_vec_init(cc_size item_size) {
     }
     return ret;
 }
+
+#endif /* PROJECT_CL_BUILD_VEC */
