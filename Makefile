@@ -2,7 +2,7 @@ ifndef CC
 	CC = gcc
 endif
 ifndef CFLAGS
-	CFLAGS = -Wall -Wextra -I. -Iinclude -O2 -g $(EXTRA_CFLAGS)
+	CFLAGS = -Wall -Wextra -Iconfig -Iinclude -O2 -g $(EXTRA_CFLAGS)
 endif
 
 define LOG
