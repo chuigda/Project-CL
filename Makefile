@@ -2,7 +2,7 @@ ifndef CC
 	CC = gcc
 endif
 ifndef CFLAGS
-	CFLAGS = -Wall -Wextra -Iconfig -Iinclude -O2 -g $(EXTRA_CFLAGS)
+	CFLAGS = -Wall -Wextra -O2 -g $(EXTRA_CFLAGS)
 endif
 
 define LOG
@@ -11,7 +11,9 @@ endef
 
 define COMPILE
 	$(call LOG,CC,$1)
-	@$(CC) $(CFLAGS) $1 -fPIC -c -o $2
+	@$(CC) $(CFLAGS) $1 \
+		-Iconfig -Iinclude -Isrc/include \
+		-fPIC -c -o $2
 endef
 
 HEADER_FILES = $(wildcard include/*.h)
@@ -31,7 +33,7 @@ libcl2.so: cc_defs.o $(OBJECT_FILES)
 	$(call LOG,LD,libcl2.so)
 	@$(CC) $(CFLAGS) $(OBJECT_FILES) -fPIC -shared -o libcl2.so
 
-%.o: src/%.c $(HEADER_FILES) $(IMPL_HEADER_FILES)
+%.o: src/%.c $(HEADER_FILES) src/include/cc_impl.h
 	$(call COMPILE,$<,$@)
 
 .PHONY: clean

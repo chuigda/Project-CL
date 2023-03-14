@@ -30,7 +30,7 @@ cc_pl5_context *cc_pl5_init();
 
 void cc_pl5_destroy(cc_pl5_context *cx);
 
-cc_error cc_pl5_define_userdata(cc_pl5_compile *cx,
+cc_error cc_pl5_define_userdata(cc_pl5_context *cx,
                                 char const *name,
                                 cc_pl5_type type,
                                 cc_size offset);

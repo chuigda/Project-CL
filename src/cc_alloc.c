@@ -1,3 +1,5 @@
+#include <cc_cfg.h>
+
 #if !defined(PROJECT_CL_BUILD_ALLOC)
 /* simply do nothing, not using alloc */
 #elif defined(PROJECT_CL_ALLOC_USE_EXTERNAL)
