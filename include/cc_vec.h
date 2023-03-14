@@ -1,12 +1,16 @@
 #ifndef PROJECT_CL_VEC_H
 #define PROJECT_CL_VEC_H
 
+#include <cc_defs.h>
+#include <cc_error.h>
+
 #if !defined(PROJECT_CL_IN_BUILD) && !defined(PROJECT_CL_BUILD_VEC)
 #   error PROJECT_CL_BUILD_VEC not defined
 #endif
 
-#include <cc_defs.h>
-#include <cc_error.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct st_cc_vec;
 
@@ -35,10 +39,6 @@ cc_error cc_vec_insert(cc_vec *vec, cc_size idx, void *value);
 cc_error cc_vec_pop(cc_vec *vec);
 
 cc_error cc_vec_remove(cc_vec *vec, cc_size idx);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifdef __cplusplus
 } /* extern "C" */
