@@ -11,7 +11,7 @@ endef
 
 define COMPILE
 	$(call LOG,CC,$1)
-	@$(CC) $(CFLAGS) -DPROJECT_CL_IN_BUILD=1 $1 -fPIC -c -o $2
+	@$(CC) $(CFLAGS) $1 -fPIC -c -o $2
 endef
 
 HEADER_FILES = $(wildcard include/*.h)
