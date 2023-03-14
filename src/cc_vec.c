@@ -11,13 +11,13 @@
 
 struct st_cc_vec {
     void *buf;
-    cc_size end;
+    cc_size size;
     cc_size cap;
     cc_size item_size;
 };
 
 cc_vec *cc_vec_init(cc_size item_size) {
-    RT_CONTRACT2(item_size > 0, NULL);
+    RT_CONTRACT2(item_size > 0, NULL)
 
     cc_vec *ret = cc_alloc(sizeof(cc_vec));
     if (ret) {
@@ -28,13 +28,13 @@ cc_vec *cc_vec_init(cc_size item_size) {
 }
 
 cc_vec *cc_vec_init2(cc_size item_size, cc_size init_cap) {
-    RT_CONTRACT2(item_size > 0 && init_cap > 0, NULL);
+    RT_CONTRACT2(item_size > 0 && init_cap > 0, NULL)
 
     cc_vec *ret = cc_alloc(sizeof(cc_vec));
     if (ret) {
         ret->buf = cc_alloc(item_size * init_cap);
         if (ret->buf) {
-            ret->end = 0;
+            ret->size = 0;
             ret->cap = init_cap;
         } else {
             cc_memset(ret, 0, sizeof(cc_vec));
@@ -54,19 +54,66 @@ void cc_vec_destroy(cc_vec *vec) {
 }
 
 cc_size cc_vec_size(cc_vec *vec) {
-    RT_CONTRACT2(vec, 0);
+    RT_CONTRACT2(vec, 0)
 
-    return vec->end;
+    return vec->size;
 }
 
 cc_size cc_vec_cap(cc_vec *vec) {
-    RT_CONTRACT2(vec, 0);
+    RT_CONTRACT2(vec, 0)
 
     return vec->cap;
 }
 
-void cc_vec_shrink(cc_vec *vec) {
-    RT_CONTRACT(vec);
+cc_error cc_vec_shrink(cc_vec *vec) {
+    RT_CONTRACT_E(vec)
+
+    if (vec->size == vec->cap) {
+        return CC_NO_ERROR;
+    }
+
+    void *newbuf = cc_alloc(vec->size * vec->item_size);
+    if (!newbuf) {
+        return CC_OUT_OF_MEMORY;
+    }
+
+    cc_memcpy(newbuf, vec->buf, vec->size * vec->item_size);
+    cc_free(vec->buf);
+    vec->buf = newbuf;
+    vec->cap = vec->size;
+
+    return CC_NO_ERROR;
+}
+
+cc_error cc_vec_reserve(cc_vec *vec, cc_size cap) {
+    RT_CONTRACT_E(vec && cap > 0)
+    
+    if (vec->cap >= cap) {
+        return CC_NO_ERROR;
+    }
+
+    void *newbuf = cc_alloc(cap * vec->item_size);
+    if (!newbuf) {
+        return CC_OUT_OF_MEMORY;
+    }
+
+    cc_memcpy(newbuf, vec->buf, vec->size * vec->item_size);
+    cc_free(vec->buf);
+    vec->buf = newbuf;
+    vec->cap = cap;
+
+    return CC_NO_ERROR;
+}
+
+void *cc_vec_at(cc_vec *vec, cc_size idx) {
+    RT_CONTRACT2(vec, NULL)
+    RT_CHECK({
+        if (idx >= vec->size) {
+            return NULL;
+        }
+    })
+
+    return CC_PTR_OFFSET2(vec->buf, vec->item_size, idx);
 }
 
 #endif /* PROJECT_CL_BUILD_VEC */

@@ -25,4 +25,13 @@
         } \
     })
 
+#define RT_CONTRACT_E(C) \
+    RT_CHECK({ \
+        _Bool v = C; \
+        cc_assert(v && "CONTRACT " #C); \
+        if (!v) { \
+            return CC_ASSERTION_WOULD_FAIL; \
+        } \
+    })
+
 #endif /* PROJECT_CL_IMPL_H */
