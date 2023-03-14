@@ -1,11 +1,11 @@
 #ifndef PROJECT_CL_ALLOC_H
 #define PROJECT_CL_ALLOC_H
 
+#include <cc_defs.h>
+
 #ifndef PROJECT_CL_BUILD_ALLOC
 #   error PROJECT_CL_BUILD_ALLOC not defined
 #endif
-
-#include <cc_defs.h>
 
 #ifdef __cplusplus
 extern "C" {
