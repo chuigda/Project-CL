@@ -71,6 +71,7 @@ clean:
 	rm -f *.o
 	rm -f *.a
 	rm -f *.so
+	rm -f *.dll
 	rm -f test_*.bin*
 	rm -rf html
 	rm -rf latex
