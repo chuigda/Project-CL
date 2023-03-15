@@ -143,38 +143,52 @@ cc_error cc_vec_push(cc_vec *vec, void *value) {
 }
 
 cc_error cc_vec_insert(cc_vec *vec, cc_size idx, void *value) {
+    return cc_vec_insert2(vec, idx, value, 1);
+}
+
+cc_error cc_vec_insert2(cc_vec *vec,
+                        cc_size idx,
+                        void *value,
+                        cc_size cnt) 
+{
     RT_CONTRACT_E(vec && value && idx < vec->size)
+    if (cnt == 0) {
+        return CC_NO_ERROR;
+    }
 
     if (!vec->buf) {
-        vec->buf = cc_alloc(vec->item_size);
+        vec->buf = cc_alloc(vec->item_size * cnt);
         if (!vec->buf) {
             return CC_OUT_OF_MEMORY;
         }
-        vec->size = 1;
-        vec->cap = 1;
-        cc_memcpy(vec->buf, value, vec->item_size);
-    } else if (vec->size < vec->cap) {
-        void *dst = CC_PTR_OFFSET2(vec->buf, vec->item_size, idx + 1);
+        vec->size = cnt;
+        vec->cap = cnt;
+        cc_memcpy(vec->buf, value, vec->item_size * cnt);
+    } else if (vec->size + cnt < vec->cap) {
+        void *dst = CC_PTR_OFFSET2(vec->buf, vec->item_size, idx + cnt);
         void *src = CC_PTR_OFFSET2(vec->buf, vec->item_size, idx);
         cc_size sz = (vec->size - idx) * vec->item_size;
         cc_memcpy(dst, src, sz);
-        cc_memcpy(src, value, vec->item_size);
+        cc_memcpy(src, value, vec->item_size * cnt);
     } else {
-        void *newbuf = cc_alloc(vec->item_size * vec->cap * 2);
+        cc_size newcap = (vec->cap * 2 > vec->size + cnt) 
+            ? vec->cap * 2
+            : vec->size + cnt;
+        void *newbuf = cc_alloc(vec->item_size * newcap);
         if (!newbuf) {
             return CC_OUT_OF_MEMORY;
         }
         cc_memcpy(newbuf, vec->buf, vec->item_size * idx);
         cc_memcpy(CC_PTR_OFFSET2(newbuf, vec->item_size, idx),
                   value,
-                  vec->item_size);
-        cc_memcpy(CC_PTR_OFFSET2(newbuf, vec->item_size, idx + 1),
+                  vec->item_size * cnt);
+        cc_memcpy(CC_PTR_OFFSET2(newbuf, vec->item_size, idx + cnt),
                   CC_PTR_OFFSET2(vec->buf, vec->item_size, idx),
                   vec->item_size * (vec->size - idx));
         cc_free(vec->buf);
         vec->buf = newbuf;
-        vec->cap *= 2;
-        vec->size += 1;
+        vec->cap = newcap;
+        vec->size += cnt;
     }
 
     return CC_NO_ERROR;

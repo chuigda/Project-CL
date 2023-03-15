@@ -36,6 +36,11 @@ cc_error cc_vec_push(cc_vec *vec, void *value);
 
 cc_error cc_vec_insert(cc_vec *vec, cc_size idx, void *value);
 
+cc_error cc_vec_insert2(cc_vec *vec,
+                        cc_size idx,
+                        void *value,
+                        cc_size cnt);
+
 cc_error cc_vec_pop(cc_vec *vec);
 
 cc_error cc_vec_remove(cc_vec *vec, cc_size idx);
