@@ -204,13 +204,16 @@ cc_error cc_vec_remove(cc_vec *vec, cc_size idx) {
 }
 
 cc_error cc_vec_remove2(cc_vec *vec, cc_size idx, cc_size cnt) {
-    RT_CONTRACT_E(vec && idx < vec->size)
+    RT_CONTRACT_E(vec && idx < vec->size && idx + cnt < vec->size)
     if (cnt == 0) {
         return CC_NO_ERROR;
     }
 
-    /* TODO implement cc_vec_remove2 */
-    return CC_UNIMPLEMENTED;
+    cc_memmove(CC_PTR_OFFSET2(vec->buf, vec->item_size, idx),
+               CC_PTR_OFFSET2(vec->buf, vec->item_size, idx + cnt),
+               (vec->size - idx - cnt) * vec->item_size);
+    vec->size -= cnt;
+    return CC_NO_ERROR;
 }
 
 #endif /* PROJECT_CL_BUILD_VEC */

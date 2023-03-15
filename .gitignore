@@ -3,9 +3,11 @@
 *.out
 *.obj
 *.so
+*.dll
 *.a
 *.lib
 *.exe
+*.bin
 *.h.gch
 cc_proc_macro
 cc_config
