@@ -26,7 +26,7 @@ void test1() {
 int main(int argc, char *argv[]) {
     cc_assert(argc == 2);
 
-    if (!strcmp(argv[2], "1")) {
+    if (!strcmp(argv[1], "1")) {
         test1();
     } else {
         cc_assert(0 && "should be unreachable");

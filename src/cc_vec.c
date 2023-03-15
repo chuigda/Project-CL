@@ -139,6 +139,7 @@ cc_error cc_vec_push(cc_vec *vec, void *value) {
 
     void *dst = CC_PTR_OFFSET2(vec->buf, vec->item_size, vec->size);
     cc_memcpy(dst, value, vec->item_size);
+    vec->size += 1;
     return CC_NO_ERROR;
 }
 
