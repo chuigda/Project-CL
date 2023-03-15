@@ -2,11 +2,12 @@
 #define PROJECT_CL_VEC_H
 
 #include <cc_defs.h>
-#include <cc_error.h>
 
 #ifndef PROJECT_CL_BUILD_VEC
 #   error PROJECT_CL_BUILD_VEC not defined
 #endif
+
+#include <cc_error.h>
 
 #ifdef __cplusplus
 extern "C" {
