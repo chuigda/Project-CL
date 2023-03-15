@@ -146,11 +146,8 @@ cc_error cc_vec_insert(cc_vec *vec, cc_size idx, void *value) {
     return cc_vec_insert2(vec, idx, value, 1);
 }
 
-cc_error cc_vec_insert2(cc_vec *vec,
-                        cc_size idx,
-                        void *value,
-                        cc_size cnt) 
-{
+cc_error
+cc_vec_insert2(cc_vec *vec, cc_size idx, void *value, cc_size cnt) {
     RT_CONTRACT_E(vec && value && idx < vec->size)
     if (cnt == 0) {
         return CC_NO_ERROR;
@@ -192,6 +189,28 @@ cc_error cc_vec_insert2(cc_vec *vec,
     }
 
     return CC_NO_ERROR;
+}
+
+cc_error cc_vec_pop(cc_vec *vec) {
+    RT_CONTRACT_E(vec)
+    if (vec->size != 0) {
+        vec->size -= 1;
+    }
+    return CC_NO_ERROR;
+}
+
+cc_error cc_vec_remove(cc_vec *vec, cc_size idx) {
+    return cc_vec_remove2(vec, idx, 1);
+}
+
+cc_error cc_vec_remove2(cc_vec *vec, cc_size idx, cc_size cnt) {
+    RT_CONTRACT_E(vec && idx < vec->size)
+    if (cnt == 0) {
+        return CC_NO_ERROR;
+    }
+
+    /* TODO implement cc_vec_remove2 */
+    return CC_UNIMPLEMENTED;
 }
 
 #endif /* PROJECT_CL_BUILD_VEC */
