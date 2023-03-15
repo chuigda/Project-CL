@@ -3,6 +3,7 @@
 #include "cc_abort.h"
 
 #include <stdio.h>
+#include <string.h>
 
 void test1() {
     cc_vec *v = cc_vec_init(sizeof(int));
@@ -23,16 +24,13 @@ void test1() {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        cc_abort();
-    }
+    cc_assert(argc == 2);
 
     if (!strcmp(argv[2], "1")) {
         test1();
     } else {
-        cc_abort();
+        cc_assert(0 && "should be unreachable");
     }
 
-    printf("TCAS system test ok\n");
     return 0;
 }
