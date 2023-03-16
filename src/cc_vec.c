@@ -144,6 +144,9 @@ cc_error cc_vec_push(cc_vec *vec, void *value) {
         }
 
         void *newbuf = cc_alloc(vec->item_size * newcap);
+        if (!newbuf) {
+            return CC_OUT_OF_MEMORY;
+        }
         if (vec->buf) {
             cc_memcpy(newbuf, vec->buf, vec->size * vec->item_size);
         }
