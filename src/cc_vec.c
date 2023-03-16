@@ -226,8 +226,6 @@ cc_error cc_vec_remove2(cc_vec *vec, cc_size idx, cc_size cnt) {
 }
 
 cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred, cc_dtor dtor) {
-    RT_CONTRACT_E(vec && pred);
-
     _Bool pred2(void *ptr, void *ctx) {
         cc_pred *fn = (cc_pred*)ctx;
         return fn(ptr);
