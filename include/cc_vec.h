@@ -42,9 +42,16 @@ cc_vec_insert2(cc_vec *vec, cc_size idx, void *value, cc_size cnt);
 
 cc_error cc_vec_pop(cc_vec *vec);
 
+cc_error cc_vec_pop_front(cc_vec *vec);
+
 cc_error cc_vec_remove(cc_vec *vec, cc_size idx);
 
 cc_error cc_vec_remove2(cc_vec *vec, cc_size idx, cc_size cnt);
+
+cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred, cc_dtor dtor);
+
+cc_error
+cc_vec_remove_if2(cc_vec *vec, cc_pred2 pred, void *ctx, cc_dtor dtor);
 
 #ifdef __cplusplus
 } /* extern "C" */

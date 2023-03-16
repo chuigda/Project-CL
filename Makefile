@@ -53,12 +53,19 @@ define RUN_TEST_ITEM
 	@printf 'PASS\n'
 endef
 
-.PHONY: test
-test: test_vec
+.PHONY: test test-log
+test: test-log test_vec
+
+test-log:
+	@echo Running tests
 
 .PHONY: test_vec
 test_vec: test_vec.bin
-	$(call RUN_TEST_ITEM,test_vec,1,1)
+	$(call RUN_TEST_ITEM,test_vec,1,5)
+	$(call RUN_TEST_ITEM,test_vec,2,5)
+	$(call RUN_TEST_ITEM,test_vec,3,5)
+	$(call RUN_TEST_ITEM,test_vec,4,5)
+	$(call RUN_TEST_ITEM,test_vec,5,5)
 
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))

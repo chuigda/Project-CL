@@ -110,4 +110,8 @@ typedef double cc_f64;
 typedef PROJECT_CL_FP128_TYPE cc_f128;
 #endif
 
+typedef _Bool (cc_pred)(void *ptr);
+typedef _Bool (cc_pred2)(void *ptr, void *ctx);
+typedef void (cc_dtor)(void *ptr);
+
 #endif /* PROJECT_CL_DEFS_H */
