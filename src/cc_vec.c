@@ -53,6 +53,10 @@ void cc_vec_destroy(cc_vec *vec) {
     cc_free(vec);
 }
 
+void cc_vec_dtor(void *vec) {
+    cc_vec_destroy((cc_vec*)vec);
+}
+
 cc_size cc_vec_size(cc_vec *vec) {
     RT_CONTRACT2(vec, 0)
 
