@@ -26,6 +26,12 @@ void cc_list_dtor(void *list);
 
 cc_size cc_list_size(cc_list *list);
 
+_Bool cc_list_empty(cc_list *list);
+
+void *cc_list_front(cc_list *list);
+
+void *cc_list_back(cc_list *list);
+
 cc_list_iter *cc_list_begin(cc_list *list);
 
 cc_list_iter *cc_list_end(cc_list *list);
@@ -43,6 +49,10 @@ cc_error cc_list_push_front(cc_list *list, void *value);
 cc_error cc_list_insert(cc_list *list, cc_list_iter *iter, void *value);
 
 cc_error cc_list_remove(cc_list *list, cc_list_iter *iter);
+
+cc_error cc_list_remove_if(cc_list *list, cc_pred pred);
+
+cc_error cc_list_remove_if2(cc_list *list, cc_pred2 pred, void *ctx);
 
 #ifdef __cplusplus
 } /* extern "C" */

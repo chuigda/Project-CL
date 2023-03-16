@@ -2,7 +2,7 @@
 #define PROJECT_CL_IMPL_H
 
 #ifdef PROJECT_CL_RUNTIME_CHECK
-#   define RT_CHECK(X) { X }
+#   define RT_CHECK(X) X
 #else
 #   define RT_CHECK(X)
 #endif
