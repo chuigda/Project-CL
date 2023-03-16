@@ -228,26 +228,12 @@ cc_error cc_vec_remove2(cc_vec *vec, cc_size idx, cc_size cnt) {
 cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred, cc_dtor dtor) {
     RT_CONTRACT_E(vec && pred);
 
-    cc_size removed = 0;
-    for (cc_size i = 0; i < vec->size; i++) {
-        void *value = CC_PTR_OFFSET2(vec->buf, vec->item_size, i);
-        if (pred(value)) {
-            if (dtor) {
-                dtor(value);
-            }
-            removed += 1;
-        } else {
-            if (removed != 0) {
-                void *dst = CC_PTR_OFFSET2(vec->buf,
-                                           vec->item_size,
-                                           i - removed);
-                cc_memcpy(dst, value, vec->item_size);
-            }
-        }
+    _Bool pred2(void *ptr, void *ctx) {
+        cc_pred *fn = (cc_pred*)ctx;
+        return fn(ptr);
     }
-    vec->size -= removed;
 
-    return CC_NO_ERROR;
+    return cc_vec_remove_if2(vec, pred2, pred, dtor);
 }
 
 cc_error
