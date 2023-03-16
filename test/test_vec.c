@@ -1,7 +1,7 @@
 #include "test_kit.h"
 
 void test1() {
-    cc_vec *v = cc_vec_init(sizeof(int));
+    cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
     int arr[4] = { 114, 514, 1919, 810 };
@@ -19,7 +19,7 @@ void test1() {
 }
 
 void test2() {
-    cc_vec *v = cc_vec_init(sizeof(int));
+    cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
     int arr[4] = { 114, 514, 1919, 810 };
@@ -52,7 +52,7 @@ void test2() {
 }
 
 void test3() {
-    cc_vec *v = cc_vec_init(sizeof(int));
+    cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
     int arr[8] = { 314, 159, 26, 535, 897, 932, 384, 626 };
@@ -85,7 +85,7 @@ void test3() {
 }
 
 void test4() {
-    cc_vec *v = cc_vec_init(sizeof(int));
+    cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
     int arr[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
@@ -95,7 +95,8 @@ void test4() {
     _Bool pred(void *ptr) {
         return *(int*)ptr % 2 == 0;
     }
-    cc_vec_remove_if(v, pred, NULL);
+
+    cc_vec_remove_if(v, pred);
     cc_assert(cc_vec_size(v) == 4);
 
     int arr2[4] = { 1, 3, 5, 7 };
@@ -109,7 +110,7 @@ void test4() {
 }
 
 void test5() {
-    cc_vec *v = cc_vec_init(sizeof(int));
+    cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
     int arr[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
@@ -119,7 +120,7 @@ void test5() {
     _Bool pred(void *ptr) {
         return *(int*)ptr % 2 != 0;
     }
-    cc_vec_remove_if(v, pred, NULL);
+    cc_vec_remove_if(v, pred);
     cc_assert(cc_vec_size(v) == 4);
 
     int arr2[4] = { 2, 4, 6, 8 };

@@ -11,23 +11,26 @@
 
 struct st_cc_vec {
     void *buf;
+    cc_dtor *dtor;
     cc_size size;
     cc_size cap;
     cc_size item_size;
 };
 
-cc_vec *cc_vec_init(cc_size item_size) {
+cc_vec *cc_vec_init(cc_size item_size, cc_dtor dtor) {
     RT_CONTRACT2(item_size > 0, NULL)
 
     cc_vec *ret = cc_alloc(sizeof(cc_vec));
     if (ret) {
         cc_memset(ret, 0, sizeof(cc_vec));
+        ret->dtor = dtor;
         ret->item_size = item_size;
     }
     return ret;
 }
 
-cc_vec *cc_vec_init2(cc_size item_size, cc_size init_cap) {
+cc_vec*
+cc_vec_init2(cc_size item_size, cc_dtor dtor, cc_size init_cap) {
     RT_CONTRACT2(item_size > 0 && init_cap > 0, NULL)
 
     cc_vec *ret = cc_alloc(sizeof(cc_vec));
@@ -39,6 +42,8 @@ cc_vec *cc_vec_init2(cc_size item_size, cc_size init_cap) {
         } else {
             cc_memset(ret, 0, sizeof(cc_vec));
         }
+
+        ret->dtor = dtor;
         ret->item_size = item_size;
     }
     return ret;
@@ -47,6 +52,13 @@ cc_vec *cc_vec_init2(cc_size item_size, cc_size init_cap) {
 void cc_vec_destroy(cc_vec *vec) {
     if (!vec) {
         return;
+    }
+
+    if (vec->dtor) {
+        for (cc_size i = 0; i < vec->size; i++) {
+            void *item = CC_PTR_OFFSET2(vec->buf, vec->item_size, i);
+            vec->dtor(item);
+        }
     }
 
     cc_free(vec->buf);
@@ -123,26 +135,29 @@ void *cc_vec_at(cc_vec *vec, cc_size idx) {
 cc_error cc_vec_push(cc_vec *vec, void *value) {
     RT_CONTRACT_E(vec && value)
 
-    if (!vec->buf) {
-        vec->buf = cc_alloc(vec->item_size);
+    if (vec->size == vec->cap) {
+        cc_size newcap;
         if (!vec->buf) {
-            return CC_OUT_OF_MEMORY;
+            newcap = 4;
+        } else {
+            newcap = vec->cap * 2;
         }
-        vec->size = 0;
-        vec->cap = 1;
-    } else if (vec->size == vec->cap) {
-        void *newbuf = cc_alloc(vec->item_size * vec->cap * 2);
-        if (!newbuf) {
-            return CC_OUT_OF_MEMORY;
+
+        void *newbuf = cc_alloc(vec->item_size * newcap);
+        if (vec->buf) {
+            cc_memcpy(newbuf, vec->buf, vec->size * vec->item_size);
         }
-        cc_memcpy(newbuf, vec->buf, vec->size * vec->item_size);
+        cc_memcpy(CC_PTR_OFFSET2(newbuf, vec->item_size, vec->size),
+                  value,
+                  vec->item_size);
         cc_free(vec->buf);
         vec->buf = newbuf;
-        vec->cap *= 2;
+        vec->cap = newcap;
+    } else {
+        cc_memcpy(CC_PTR_OFFSET2(vec->buf, vec->item_size, vec->size),
+                  value,
+                  vec->item_size);
     }
-
-    void *dst = CC_PTR_OFFSET2(vec->buf, vec->item_size, vec->size);
-    cc_memcpy(dst, value, vec->item_size);
     vec->size += 1;
     return CC_NO_ERROR;
 }
@@ -200,6 +215,12 @@ cc_error cc_vec_pop(cc_vec *vec) {
     RT_CONTRACT_E(vec)
     if (vec->size != 0) {
         vec->size -= 1;
+        if (vec->dtor) {
+            void *item = CC_PTR_OFFSET2(vec->buf,
+                                        vec->item_size,
+                                        vec->size);
+            vec->dtor(item);
+        }
     }
     return CC_NO_ERROR;
 }
@@ -222,6 +243,13 @@ cc_error cc_vec_remove2(cc_vec *vec, cc_size idx, cc_size cnt) {
         return CC_NO_ERROR;
     }
 
+    if (vec->dtor) {
+        for (cc_size i = idx; i < idx + cnt; i++) {
+            void *item = CC_PTR_OFFSET2(vec->buf, vec->item_size, i);
+            vec->dtor(item);
+        }
+    }
+
     cc_memmove(CC_PTR_OFFSET2(vec->buf, vec->item_size, idx),
                CC_PTR_OFFSET2(vec->buf, vec->item_size, idx + cnt),
                (vec->size - idx - cnt) * vec->item_size);
@@ -229,25 +257,24 @@ cc_error cc_vec_remove2(cc_vec *vec, cc_size idx, cc_size cnt) {
     return CC_NO_ERROR;
 }
 
-cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred, cc_dtor dtor) {
+cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred) {
     _Bool pred2(void *ptr, void *ctx) {
         cc_pred *fn = (cc_pred*)ctx;
         return fn(ptr);
     }
-
-    return cc_vec_remove_if2(vec, pred2, pred, dtor);
+    return cc_vec_remove_if2(vec, pred2, pred);
 }
 
 cc_error
-cc_vec_remove_if2(cc_vec *vec, cc_pred2 pred, void *ctx, cc_dtor dtor) {
+cc_vec_remove_if2(cc_vec *vec, cc_pred2 pred, void *ctx) {
     RT_CONTRACT_E(vec && pred);
 
     cc_size removed = 0;
     for (cc_size i = 0; i < vec->size; i++) {
         void *value = CC_PTR_OFFSET2(vec->buf, vec->item_size, i);
         if (pred(value, ctx)) {
-            if (dtor) {
-                dtor(value);
+            if (vec->dtor) {
+                vec->dtor(value);
             }
             removed += 1;
         } else {

@@ -17,9 +17,10 @@ struct st_cc_vec;
 
 typedef struct st_cc_vec cc_vec;
 
-cc_vec *cc_vec_init(cc_size item_size);
+cc_vec *cc_vec_init(cc_size item_size, cc_dtor dtor);
 
-cc_vec *cc_vec_init2(cc_size item_size, cc_size init_cap);
+cc_vec*
+cc_vec_init2(cc_size item_size, cc_dtor dtor, cc_size init_cap);
 
 void cc_vec_destroy(cc_vec *vec);
 
@@ -50,10 +51,9 @@ cc_error cc_vec_remove(cc_vec *vec, cc_size idx);
 
 cc_error cc_vec_remove2(cc_vec *vec, cc_size idx, cc_size cnt);
 
-cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred, cc_dtor dtor);
+cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred);
 
-cc_error
-cc_vec_remove_if2(cc_vec *vec, cc_pred2 pred, void *ctx, cc_dtor dtor);
+cc_error cc_vec_remove_if2(cc_vec *vec, cc_pred2 pred, void *ctx);
 
 #ifdef __cplusplus
 } /* extern "C" */
