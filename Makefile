@@ -44,7 +44,9 @@ $(SHARED_LIB_NAME): cc_defs.o $(OBJECT_FILES)
 
 define BUILD_TEST_ITEM
 	$(call LOG,BUILD,$1)
-	@$(CC) $(CFLAGS) $2 -Iconfig -Iinclude -L. -lcl2 -lm -o $1
+	@$(CC) $(CFLAGS) $2 \
+		-Iconfig -Iinclude -Itest/kit \
+		-L. -lcl2 -lm -o $1
 endef
 
 define RUN_TEST_ITEM

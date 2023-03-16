@@ -1,9 +1,4 @@
-#include "cc_vec.h"
-#include "cc_assert.h"
-#include "cc_abort.h"
-
-#include <stdio.h>
-#include <string.h>
+#include "test_kit.h"
 
 void test1() {
     cc_vec *v = cc_vec_init(sizeof(int));
@@ -137,22 +132,12 @@ void test5() {
     cc_vec_destroy(v);
 }
 
-int main(int argc, char *argv[]) {
-    cc_assert(argc == 2);
+BEGIN_TEST
 
-    if (!strcmp(argv[1], "1")) {
-        test1();
-    } else if (!strcmp(argv[1], "2")) {
-        test2();
-    } else if (!strcmp(argv[1], "3")) {
-        test3();
-    } else if (!strcmp(argv[1], "4")) {
-        test4();
-    } else if (!strcmp(argv[1], "5")) {
-        test5();
-    } else {
-        cc_assert(0 && "should be unreachable");
-    }
+    AUTO_TEST_ITEM(1)
+    AUTO_TEST_ITEM(2)
+    AUTO_TEST_ITEM(3)
+    AUTO_TEST_ITEM(4)
+    AUTO_TEST_ITEM(5)
 
-    return 0;
-}
+END_TEST
