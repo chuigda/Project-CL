@@ -25,6 +25,13 @@ cc_map_init(cc_size key_size,
             cc_hash hash,
             cc_dtor dtor);
 
+cc_map*
+cc_map_init2(cc_size key_size,
+             cc_size value_size,
+             cc_hash hash,
+             cc_dtor dtor,
+             cc_size init_bucket_cnt);
+
 void cc_map_destroy(cc_map *map);
 
 void cc_map_dtor(void *map);
