@@ -18,9 +18,11 @@ struct st_cc_list;
 typedef struct st_cc_list cc_list;
 typedef struct st_cc_list_node cc_list_iter;
 
-cc_list *cc_list_init(cc_size item_size);
+cc_list *cc_list_init(cc_size item_size, cc_dtor dtor);
 
 void cc_list_destroy(cc_list *list);
+
+void cc_list_dtor(void *list);
 
 cc_size cc_list_size(cc_list *list);
 

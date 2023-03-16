@@ -133,6 +133,24 @@ void test5() {
     cc_vec_destroy(v);
 }
 
+void test6() {
+    static int collected = 0;
+    void dtor(void *ptr) {
+        (void)ptr;
+        collected += 1;
+    }
+
+    cc_vec *v = cc_vec_init(sizeof(char), dtor);
+    cc_assert(v);
+
+    char *buf = "DEADBEEF";
+    cc_vec_insert2(v, 0, buf, 8);
+    cc_assert(cc_vec_size(v) == 8);
+
+    cc_vec_destroy(v);
+    cc_assert(collected == 8);
+}
+
 BEGIN_TEST
 
     AUTO_TEST_ITEM(1)
@@ -140,5 +158,6 @@ BEGIN_TEST
     AUTO_TEST_ITEM(3)
     AUTO_TEST_ITEM(4)
     AUTO_TEST_ITEM(5)
+    AUTO_TEST_ITEM(6)
 
 END_TEST

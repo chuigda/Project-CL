@@ -63,11 +63,12 @@ test-log:
 
 .PHONY: test_vec
 test_vec: test_vec.bin
-	$(call RUN_TEST_ITEM,test_vec,1,5)
-	$(call RUN_TEST_ITEM,test_vec,2,5)
-	$(call RUN_TEST_ITEM,test_vec,3,5)
-	$(call RUN_TEST_ITEM,test_vec,4,5)
-	$(call RUN_TEST_ITEM,test_vec,5,5)
+	$(call RUN_TEST_ITEM,test_vec,1,6)
+	$(call RUN_TEST_ITEM,test_vec,2,6)
+	$(call RUN_TEST_ITEM,test_vec,3,6)
+	$(call RUN_TEST_ITEM,test_vec,4,6)
+	$(call RUN_TEST_ITEM,test_vec,5,6)
+	$(call RUN_TEST_ITEM,test_vec,6,6)
 
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))

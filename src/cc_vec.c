@@ -185,8 +185,8 @@ cc_vec_insert2(cc_vec *vec, cc_size idx, void *value, cc_size cnt) {
         void *dst = CC_PTR_OFFSET2(vec->buf, vec->item_size, idx + cnt);
         void *src = CC_PTR_OFFSET2(vec->buf, vec->item_size, idx);
         cc_size sz = (vec->size - idx) * vec->item_size;
-        cc_memcpy(dst, src, sz);
-        cc_memcpy(src, value, vec->item_size * cnt);
+        cc_memmove(dst, src, sz);
+        cc_memmove(src, value, vec->item_size * cnt);
     } else {
         cc_size newcap = (vec->cap * 2 > vec->size + cnt) 
             ? vec->cap * 2
