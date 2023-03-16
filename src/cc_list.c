@@ -24,6 +24,7 @@ struct st_cc_list {
     cc_list_node *prev;
     cc_list_node *next;
 
+    cc_dtor *dtor;
     cc_size item_size;
 };
 

@@ -132,6 +132,24 @@ void *cc_vec_at(cc_vec *vec, cc_size idx) {
     return CC_PTR_OFFSET2(vec->buf, vec->item_size, idx);
 }
 
+void *cc_vec_front(cc_vec *vec) {
+    RT_CONTRACT2(vec, NULL);
+    if (vec->size == 0) {
+        return NULL;
+    }
+
+    return vec->buf;
+}
+
+void *cc_vec_back(cc_vec *vec) {
+    RT_CONTRACT2(vec, NULL);
+    if (vec->size == 0) {
+        return NULL;
+    }
+
+    return CC_PTR_OFFSET2(vec->buf, vec->item_size, vec->size - 1);
+}
+
 cc_error cc_vec_push(cc_vec *vec, void *value) {
     RT_CONTRACT_E(vec && value)
 
