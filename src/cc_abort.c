@@ -8,24 +8,18 @@
 
 #   include <stdlib.h>
 
-#if PROJECT_CL_HAS_ATTRIBUTE(cold)
-
-__attribute__((cold))
-#endif
-void cc_abort(void) {
+CC_ATTRIBUTE_COLD void cc_abort(void) {
     abort();
 }
 
 #elif defined(PROJECT_CL_ABORT_USE_DEAD_LOOP)
 
-#if PROJECT_CL_HAS_ATTRIBUTE(cold)
-__attribute__((cold))
-#endif
-void cc_abort(void) {
+CC_ATTRIBUTE_COLD void cc_abort(void) {
     /* https://stackoverflow.com/questions/66109167 */
     volatile int spin = 1;
     while (*(volatile int*)&spin) {}
 }
+
 #else
 #   error no valid PROJECT_CL_ABORT_* suboption
 #endif
