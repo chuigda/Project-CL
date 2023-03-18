@@ -2,7 +2,8 @@
 #include "cc_hash/common.h"
 #include "cc_hash/asimd.h"
 #include "cc_hash/ssse3.h"
-#define CC_INTERNAL_IS_BIG_ENDIAN() (!*(unsigned char *)&(uint16_t){1})
+#include "cc_impl.h"
+
 /* emulate uint128 for internal use */
 typedef struct {
     union {
@@ -15,11 +16,11 @@ typedef struct {
 
 #ifndef __SIZEOF_INT128__
 static inline cc_uint64 *cc_internal_uin128_low(cc_impl_uint128 *x) {
-    return &x->data[CC_INTERNAL_IS_BIG_ENDIAN()];
+    return &x->data[PROJECT_CL_IS_BIG_ENDIAN()];
 }
 
 static inline cc_uint64 *cc_internal_uin128_high(cc_impl_uint128 *x) {
-    return &x->data[!CC_INTERNAL_IS_BIG_ENDIAN()];
+    return &x->data[!PROJECT_CL_IS_BIG_ENDIAN()];
 }
 
 static inline void cc_internal_full_mul(cc_uint64 op1, cc_uint64 op2, cc_uint64 *hi, cc_uint64 *lo) {
