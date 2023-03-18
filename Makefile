@@ -85,6 +85,3 @@ clean:
 	rm -rf test_*.bin* # dSYM is a directory
 	rm -rf html
 	rm -rf latex
-
-test: all
-
