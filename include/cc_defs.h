@@ -69,7 +69,9 @@ typedef PROJECT_CL_INT64_TYPE cc_int64;
 typedef int64_t cc_int64;
 #   endif
 #   ifdef PROJECT_CL_UINT64_TYPE
-typedef PROJECT_CL_UINT64_TYPE cc_uint64;def 
+typedef PROJECT_CL_UINT64_TYPE cc_uint64;
+#   else
+typedef uint64_t cc_uint64;
 #   endif
 #endif
 
