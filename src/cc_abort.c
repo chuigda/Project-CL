@@ -34,9 +34,9 @@ _Bool cc_dump_stacktrace(void) {
     void *array[64];
     int size;
     size = backtrace(array, 64);
-    PROJECT_CL_UNUSED(write(0, "\n\n", 2));
+    if (write(0, "\n\n", 2)) {}
     backtrace_symbols_fd(array, size, 0);
-    PROJECT_CL_UNUSED(write(0, "\n", 1));
+    if (write(0, "\n", 1)) {}
     return 1;
 }
 
