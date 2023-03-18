@@ -8,7 +8,7 @@ typedef struct {
     union {
         _Alignas(16) cc_uint64 data[2];
 #ifdef __SIZEOF_INT128__
-        unsigned __int128 whole_data;
+        __extension__ unsigned __int128 whole_data;
 #endif
     };
 } cc_impl_uint128;
