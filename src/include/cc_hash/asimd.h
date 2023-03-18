@@ -1,6 +1,6 @@
 #ifndef PROJECT_CL_HASH_ASIMD_H
 #define PROJECT_CL_HASH_ASIMD_H
-#ifdef __ARM_NEON
+#if defined(__ARM_NEON) && defined(__ARM_FEATURE_AES)
 
 #include <arm_neon.h>
 #include <cc_defs.h>
@@ -26,12 +26,12 @@ cc_hash_simd_downcast(cc_hashvec data, cc_size size) {
 
 inline static cc_hashvec
 cc_hash_simd_encode(cc_hashvec x, cc_hashvec y) {
-    return vaesmcq_u8(vaeseq_u8(x, vdupq_n_u8(0))) ^ y;
+    return veorq_u8(vaesmcq_u8(vaeseq_u8(x, vdupq_n_u8(0))), y);
 }
 
 inline static cc_hashvec
 cc_hash_simd_decode(cc_hashvec x, cc_hashvec y) {
-    return vaesimcq_u8(vaesdq_u8(x, vdupq_n_u8(0))) ^ y;
+    return veorq_u8(vaesimcq_u8(vaesdq_u8(x, vdupq_n_u8(0))), y);
 }
 
 inline static cc_hashvec
