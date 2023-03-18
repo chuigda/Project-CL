@@ -82,6 +82,9 @@ clean:
 	rm -f *.a
 	rm -f *.so
 	rm -f *.dll
-	rm -f test_*.bin*
+	rm -rf test_*.bin* # dSYM is a directory
 	rm -rf html
 	rm -rf latex
+
+test: all
+

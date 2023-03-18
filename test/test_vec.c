@@ -84,6 +84,10 @@ void test3() {
     cc_vec_destroy(v);
 }
 
+static inline _Bool test_vec_internal_test4_pred(void *ptr) {
+    return *(int*)ptr % 2 == 0;
+}
+
 void test4() {
     cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
@@ -92,11 +96,7 @@ void test4() {
     cc_vec_insert2(v, 0, arr, 8);
     cc_assert(cc_vec_size(v) == 8);
 
-    _Bool pred(void *ptr) {
-        return *(int*)ptr % 2 == 0;
-    }
-
-    cc_vec_remove_if(v, pred);
+    cc_vec_remove_if(v, test_vec_internal_test4_pred);
     cc_assert(cc_vec_size(v) == 4);
 
     int arr2[4] = { 1, 3, 5, 7 };
@@ -109,6 +109,10 @@ void test4() {
     cc_vec_destroy(v);
 }
 
+static inline _Bool test_vec_internal_test5_pred(void *ptr) {
+    return *(int*)ptr % 2 != 0;
+}
+
 void test5() {
     cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
@@ -117,10 +121,7 @@ void test5() {
     cc_vec_insert2(v, 0, arr, 8);
     cc_assert(cc_vec_size(v) == 8);
 
-    _Bool pred(void *ptr) {
-        return *(int*)ptr % 2 != 0;
-    }
-    cc_vec_remove_if(v, pred);
+    cc_vec_remove_if(v, test_vec_internal_test5_pred);
     cc_assert(cc_vec_size(v) == 4);
 
     int arr2[4] = { 2, 4, 6, 8 };
@@ -133,14 +134,15 @@ void test5() {
     cc_vec_destroy(v);
 }
 
-void test6() {
-    static int collected = 0;
-    void dtor(void *ptr) {
-        (void)ptr;
-        collected += 1;
-    }
+static int collected = 0;
 
-    cc_vec *v = cc_vec_init(sizeof(char), dtor);
+static inline void test_vec_internal_dtor(void *ptr) {
+    (void)ptr;
+    collected += 1;
+}
+
+void test6() {
+    cc_vec *v = cc_vec_init(sizeof(char), test_vec_internal_dtor);
     cc_assert(v);
 
     char *buf = "DEADBEEF";

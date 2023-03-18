@@ -8,6 +8,8 @@
 *.lib
 *.exe
 *.bin
+*.d
+*.dSYM
 *.h.gch
 cc_proc_macro
 cc_config

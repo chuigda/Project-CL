@@ -114,4 +114,22 @@ typedef _Bool (cc_pred)(void *ptr);
 typedef _Bool (cc_pred2)(void *ptr, void *ctx);
 typedef void (cc_dtor)(void *ptr);
 
+#ifdef __has_builtin
+#define PROJECT_CL_HAS_BUILTIN(X) __has_builtin(X)
+#else
+#define PROJECT_CL_HAS_BUILTIN(X) 0
+#endif
+
+#ifdef __has_attribute
+#define PROJECT_CL_HAS_ATTRIBUTE(X) __has_attribute(X)
+#else
+#define PROJECT_CL_HAS_ATTRIBUTE(X) 0
+#endif
+
+#if PROJECT_CL_HAS_ATTRIBUTE(visibility) /* TODO: export only public APIs */
+#define PROJECT_CL_EXPORT __attribute__((visbility("default")))
+#else
+#define PROJECT_CL_EXPORT
+#endif
+
 #endif /* PROJECT_CL_DEFS_H */
