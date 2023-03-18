@@ -5,12 +5,14 @@
 #include <immintrin.h>
 #include <cc_defs.h>
 #include "common.h"
+#include "cl_impl.h"
 
 #define PROJECT_CL_HASH_HAS_BASIC_SIMD     1
 typedef __m128i cc_hashvec;
 
 inline static cc_size
 cc_hash_simd_lanes(cc_hashvec ignored) {
+    PROJECT_CL_UNUSED(ignored);
     return 16;
 }
 
@@ -20,7 +22,8 @@ cc_hash_simd_broadcast(__m128i data) {
 }
 
 inline static __m128i
-cc_hash_simd_downcast(cc_hashvec data, cc_size size) {
+cc_hash_simd_downcast(cc_hashvec data, cc_size idx) {
+    PROJECT_CL_UNUSED(idx);
     return data;
 }
 

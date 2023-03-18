@@ -22,8 +22,8 @@ cc_hash_simd_broadcast(uint8x16_t data) {
 }
 
 inline static uint8x16_t
-cc_hash_simd_downcast(cc_hashvec data, cc_size size) {
-    PROJECT_CL_UNUSED(size);
+cc_hash_simd_downcast(cc_hashvec data, cc_size idx) {
+    PROJECT_CL_UNUSED(idx);
     return data;
 }
 
