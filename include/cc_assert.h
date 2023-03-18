@@ -6,8 +6,16 @@
 #if !defined(PROJECT_CL_BUILD_ASSERT) || defined(NDEBUG)
 #   define cc_assert(x)
 #elif defined(PROJECT_CL_ASSERT_USE_LIBC)
+
 #   include <assert.h>
-#   define cc_assert assert
+#   include <cc_abort.h>
+
+#   define cc_assert(x)       \
+    do {                      \
+        if (!(x))             \
+        cc_dump_stacktrace(); \
+        assert(x);            \
+    } while (0)
 #else
 #   define cc_assert(x) cc_assert_impl((x), ##x, __FILE__, __LINE__);
 extern "C" void cc_assert_impl(int value,

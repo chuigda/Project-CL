@@ -278,12 +278,13 @@ cc_error cc_vec_remove2(cc_vec *vec, cc_size idx, cc_size cnt) {
     return CC_NO_ERROR;
 }
 
+static inline _Bool cc_vec_internal_remove_if_pred2(void *ptr, void *ctx) {
+    cc_pred *fn = (cc_pred*)ctx;
+    return fn(ptr);
+}
+
 cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred) {
-    _Bool pred2(void *ptr, void *ctx) {
-        cc_pred *fn = (cc_pred*)ctx;
-        return fn(ptr);
-    }
-    return cc_vec_remove_if2(vec, pred2, pred);
+    return cc_vec_remove_if2(vec, cc_vec_internal_remove_if_pred2, pred);
 }
 
 cc_error
