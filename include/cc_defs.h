@@ -69,9 +69,7 @@ typedef PROJECT_CL_INT64_TYPE cc_int64;
 typedef int64_t cc_int64;
 #   endif
 #   ifdef PROJECT_CL_UINT64_TYPE
-typedef PROJECT_CL_UINT64_TYPE cc_uint64;
-#   else
-typedef uint64_t cc_uint64;
+typedef PROJECT_CL_UINT64_TYPE cc_uint64;def 
 #   endif
 #endif
 
@@ -95,6 +93,7 @@ typedef PROJECT_CL_FP16_TYPE cc_f16;
 #endif
 
 #ifdef PROJECT_CL_FP32_TYPE
+#ifndef CC_ATTRIBUTE_EXPORT
 typedef PROJECT_CL_FP32_TYPE cc_f32;
 #else
 typedef float cc_f32;
@@ -114,22 +113,21 @@ typedef _Bool (cc_pred)(void *ptr);
 typedef _Bool (cc_pred2)(void *ptr, void *ctx);
 typedef void (cc_dtor)(void *ptr);
 
-#ifdef __has_builtin
-#define PROJECT_CL_HAS_BUILTIN(X) __has_builtin(X)
-#else
-#define PROJECT_CL_HAS_BUILTIN(X) 0
+#if defined(__has_attribute) && !defined(PROJECT_CL_DONT_PROBE_ATTRIBUTE)
+#   if !defined(CC_ATTRIBUTE_EXPORT) && __has_attribute(visbility)
+#       define CC_ATTRIBUTE_EXPORT __attribute__((visbility("default")))
+#   endif
+#   if !defined(CC_ATTRIBUTE_COLD) && __has_attribute(cold)
+#       define CC_ATTRIBUTE_COLD __attribute__((cold))
+#   endif
 #endif
 
-#ifdef __has_attribute
-#define PROJECT_CL_HAS_ATTRIBUTE(X) __has_attribute(X)
-#else
-#define PROJECT_CL_HAS_ATTRIBUTE(X) 0
+#ifndef CC_ATTRIBUTE_EXPORT
+#   define CC_ATTRIBUTE_EXPORT
 #endif
 
-#if PROJECT_CL_HAS_ATTRIBUTE(visibility) /* TODO: export only public APIs */
-#define PROJECT_CL_EXPORT __attribute__((visbility("default")))
-#else
-#define PROJECT_CL_EXPORT
+#ifndef CC_ATTRIBUTE_COLD
+#   define CC_ATTRIBUTE_COLD
 #endif
 
 #endif /* PROJECT_CL_DEFS_H */
