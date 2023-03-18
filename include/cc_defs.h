@@ -93,7 +93,6 @@ typedef PROJECT_CL_FP16_TYPE cc_f16;
 #endif
 
 #ifdef PROJECT_CL_FP32_TYPE
-#ifndef CC_ATTRIBUTE_EXPORT
 typedef PROJECT_CL_FP32_TYPE cc_f32;
 #else
 typedef float cc_f32;
