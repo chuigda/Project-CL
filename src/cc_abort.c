@@ -30,7 +30,7 @@ CC_ATTRIBUTE_COLD void cc_abort(void) {
 #include <unistd.h>
 #include "cc_impl.h"
 
-_Bool cc_dump_stacktrace() {
+_Bool cc_dump_stacktrace(void) {
     void *array[64];
     int size;
     size = backtrace(array, 64);

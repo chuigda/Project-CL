@@ -284,7 +284,7 @@ static inline _Bool cc_vec_internal_remove_if_pred2(void *ptr, void *ctx) {
 }
 
 cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred) {
-    return cc_vec_remove_if2(vec, cc_vec_internal_remove_if_pred2, pred);
+    return cc_vec_remove_if2(vec, cc_vec_internal_remove_if_pred2, (void *)pred);
 }
 
 cc_error

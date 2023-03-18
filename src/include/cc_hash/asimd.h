@@ -4,6 +4,7 @@
 
 #include <arm_neon.h>
 #include <cc_defs.h>
+#include "cc_impl.h"
 #include "common.h"
 
 #define PROJECT_CL_HASH_HAS_BASIC_SIMD     1
@@ -11,6 +12,7 @@ typedef uint8x16_t cc_hashvec;
 
 inline static cc_size
 cc_hash_simd_lanes(cc_hashvec ignored) {
+    PROJECT_CL_UNUSED(ignored);
     return 16;
 }
 
@@ -21,6 +23,7 @@ cc_hash_simd_broadcast(uint8x16_t data) {
 
 inline static uint8x16_t
 cc_hash_simd_downcast(cc_hashvec data, cc_size size) {
+    PROJECT_CL_UNUSED(size);
     return data;
 }
 
@@ -46,7 +49,7 @@ cc_hash_simd_shuffle(cc_hashvec x, cc_hashvec table) {
 }
 
 inline static cc_hashvec
-cc_hash_simd_shuffle_mask() {
+cc_hash_simd_shuffle_mask(void) {
     return vld1q_u8 (&CC_HASH_SHUFFLE_TABLE[0]);
 }
 

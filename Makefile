@@ -2,7 +2,7 @@ ifndef CC
 	CC = gcc
 endif
 ifndef CFLAGS
-	CFLAGS = -Wall -Wextra -O2 -g $(EXTRA_CFLAGS)
+	CFLAGS = -Wall -Wextra -pedantic -Werror -O2 -g $(EXTRA_CFLAGS)
 endif
 
 ifndef WIN32

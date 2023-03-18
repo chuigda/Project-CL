@@ -7,9 +7,9 @@
 extern "C" {
 #endif
 
-CC_ATTRIBUTE_COLD void cc_abort();
+CC_ATTRIBUTE_COLD void cc_abort(void);
 
-CC_ATTRIBUTE_COLD _Bool cc_dump_stacktrace();
+CC_ATTRIBUTE_COLD _Bool cc_dump_stacktrace(void);
 
 #ifdef __cplusplus
 } /* extern "C" */
