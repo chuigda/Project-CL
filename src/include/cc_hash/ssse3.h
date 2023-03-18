@@ -46,7 +46,7 @@ cc_hash_simd_shuffle(cc_hashvec x, cc_hashvec table) {
 
 inline static cc_hashvec
 cc_hash_simd_shuffle_mask() {
-    return _mm_load_si128((const __m128i *)&SHUFFLE_TABLE[0]);
+    return _mm_load_si128((const __m128i *)&CC_HASH_SHUFFLE_TABLE[0]);
 }
 
 inline static cc_hashvec

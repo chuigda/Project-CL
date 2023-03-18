@@ -1,6 +1,7 @@
 #include <cc_hash.h>
 #include "cc_hash/common.h"
 #include "cc_hash/asimd.h"
+#include "cc_hash/ssse3.h"
 #define CC_INTERNAL_IS_BIG_ENDIAN() (!*(unsigned char *)&(uint16_t){1})
 /* emulate uint128 for internal use */
 typedef struct {

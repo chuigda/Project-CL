@@ -34,4 +34,7 @@
         } \
     })
 
+#define PROJECT_CL_UNUSED(X) ((void)(X))
+
 #endif /* PROJECT_CL_IMPL_H */
+
