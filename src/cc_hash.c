@@ -4,6 +4,7 @@
 #include "cc_hash/sve.h"
 #include "cc_hash/vaes.h"
 #include "cc_impl.h"
+#include <cc_alloc.h>
 #include <cc_hash.h>
 
 /* emulate uint128 for internal use */
@@ -223,23 +224,30 @@ static inline void cc_hash_stable_digest128(cc_stable_hasher *hasher,
       (hasher->buffer + hasher->pad) ^ combined, PROJECT_CL_STABLE_HASH_ROTATE);
 }
 
-CC_ATTRIBUTE_EXPORT
-cc_uint64 cc_finalize_stable_hasher(const cc_hasher *hasher) {
+static inline cc_uint64
+cc_finalize_stable_hasher_inplace(cc_hasher_handle hasher) {
   const cc_stable_hasher *shasher = (const cc_stable_hasher *)hasher;
   cc_uint64 rot = shasher->buffer & 63;
   return cc_hash_rotate_left(
       cc_hash_folded_multiply(shasher->buffer, shasher->pad), rot);
 }
 
+CC_ATTRIBUTE_EXPORT
+cc_uint64 cc_finalize_stable_hasher(cc_hasher_handle hasher) {
+  cc_uint64 hash = cc_finalize_stable_hasher_inplace(hasher);
+  cc_free(hasher);
+  return hash;
+}
+
 static inline cc_uint64 cc_hash_stable_mix_integer(cc_stable_hasher hasher,
                                                    cc_uint64 x, cc_uint64 y) {
   cc_hash_stable_digest128(&hasher, cc_hash_cast_uint64_to_uint128(x));
   cc_hash_stable_digest128(&hasher, cc_hash_cast_uint64_to_uint128(y));
-  return cc_finalize_stable_hasher((const cc_hasher *)&hasher);
+  return cc_finalize_stable_hasher_inplace((cc_hasher_handle)&hasher);
 }
 
-CC_ATTRIBUTE_EXPORT
-void cc_initialize_stable_hasher(cc_hasher *hasher, cc_uint64 seed) {
+static inline void cc_initialize_stable_hasher_inplace(cc_hasher_handle hasher,
+                                                       cc_uint64 seed) {
   cc_stable_hasher *shasher = (cc_stable_hasher *)hasher;
   shasher->buffer = PI[0];
   shasher->pad = PI[1];
@@ -259,7 +267,15 @@ void cc_initialize_stable_hasher(cc_hasher *hasher, cc_uint64 seed) {
 }
 
 CC_ATTRIBUTE_EXPORT
-void cc_stable_hasher_digest(cc_hasher *hasher, const void *input,
+cc_hasher_handle cc_initialize_stable_hasher(cc_uint64 seed) {
+  cc_hasher_handle hasher =
+      (cc_hasher_handle)cc_alloc2(sizeof(cc_stable_hasher), 16);
+  cc_initialize_stable_hasher_inplace(hasher, seed);
+  return hasher;
+}
+
+CC_ATTRIBUTE_EXPORT
+void cc_stable_hasher_digest(cc_hasher_handle hasher, const void *input,
                              cc_size length) {
   cc_stable_hasher *shasher = (cc_stable_hasher *)hasher;
   const cc_uint8 *data = (const cc_uint8 *)input;
@@ -368,7 +384,8 @@ PROJECT_CL_GENERATE_VECTORIZED_DIGEST(cc_wide_hashvec, cc_hashvec, cc_hash_wide)
 
 #endif
 
-static inline cc_uint64 cc_finalize_simd_hasher(const cc_hasher *hasher) {
+static inline cc_uint64
+cc_finalize_simd_hasher_inplace(cc_hasher_handle hasher) {
   const cc_simd_hasher *vhasher = (const cc_simd_hasher *)hasher;
   cc_hashvec combined = cc_hash_simd_decode(vhasher->sum, vhasher->enc);
   cc_hashvec result = cc_hash_simd_encode(
@@ -376,15 +393,21 @@ static inline cc_uint64 cc_finalize_simd_hasher(const cc_hasher *hasher) {
   return cc_hash_simd_lower_half(result);
 }
 
+static inline cc_uint64 cc_finalize_simd_hasher(cc_hasher_handle hasher) {
+  cc_uint64 hash = cc_finalize_simd_hasher_inplace(hasher);
+  cc_free(hasher);
+  return hash;
+}
+
 static inline cc_uint64 cc_hash_simd_mix_integer(cc_simd_hasher hasher,
                                                  cc_uint64 x, cc_uint64 y) {
   cc_simd_hash_digest_hashvec(&hasher, cc_hash_simd_u64x2(x, 0));
   cc_simd_hash_digest_hashvec(&hasher, cc_hash_simd_u64x2(y, 0));
-  return cc_finalize_simd_hasher((const cc_hasher *)&hasher);
+  return cc_finalize_simd_hasher_inplace((cc_hasher_handle)&hasher);
 }
 
-static inline void cc_initialize_simd_hasher(cc_hasher *hasher,
-                                             cc_uint64 seed) {
+static inline void cc_initialize_simd_hasher_inplace(cc_hasher_handle hasher,
+                                                     cc_uint64 seed) {
   cc_simd_hasher *vhasher = (cc_simd_hasher *)hasher;
   vhasher->enc = cc_hash_simd_u64x2(PI[0], PI[1]);
   vhasher->sum = cc_hash_simd_u64x2(PI[2], PI[3]);
@@ -401,8 +424,14 @@ static inline void cc_initialize_simd_hasher(cc_hasher *hasher,
   vhasher->key = cc_hash_simd_xor(vhasher->enc, vhasher->sum);
 }
 
-static inline void cc_simd_hasher_digest(cc_hasher *hasher, const void *input,
-                                         size_t length) {
+static inline cc_hasher_handle cc_initialize_simd_hasher(cc_uint64 seed) {
+  cc_hasher_handle hasher = cc_alloc2(sizeof(cc_simd_hasher), 16);
+  cc_initialize_simd_hasher_inplace(hasher, seed);
+  return hasher;
+}
+
+static inline void cc_simd_hasher_digest(cc_hasher_handle hasher,
+                                         const void *input, size_t length) {
   cc_simd_hasher *vhasher = (cc_simd_hasher *)hasher;
   const cc_uint8 *data = (const uint8_t *)input;
   vhasher->enc = cc_hash_simd_lower_add(vhasher->enc, length);
@@ -446,16 +475,16 @@ static inline void cc_simd_hasher_digest(cc_hasher *hasher, const void *input,
 #endif
 
 CC_ATTRIBUTE_EXPORT
-void cc_initialize_unstable_hasher(cc_hasher *hasher, cc_uint64 seed) {
+cc_hasher_handle cc_initialize_unstable_hasher(cc_uint64 seed) {
 #if PROJECT_CL_HASH_HAS_BASIC_SIMD
-  cc_initialize_simd_hasher(hasher, seed);
+  return cc_initialize_simd_hasher(seed);
 #else
-  cc_initialize_stable_hasher(hasher, seed);
+  return cc_initialize_stable_hasher(seed);
 #endif
 }
 
 CC_ATTRIBUTE_EXPORT
-cc_uint64 cc_finalize_unstable_hasher(const cc_hasher *hasher) {
+cc_uint64 cc_finalize_unstable_hasher(cc_hasher_handle hasher) {
 #if PROJECT_CL_HASH_HAS_BASIC_SIMD
   return cc_finalize_simd_hasher(hasher);
 #else
@@ -464,7 +493,7 @@ cc_uint64 cc_finalize_unstable_hasher(const cc_hasher *hasher) {
 }
 
 CC_ATTRIBUTE_EXPORT
-void cc_unstable_hasher_digest(cc_hasher *hasher, const void *input,
+void cc_unstable_hasher_digest(cc_hasher_handle hasher, const void *input,
                                cc_size length) {
 #if PROJECT_CL_HASH_HAS_BASIC_SIMD
   cc_simd_hasher_digest(hasher, input, length);
@@ -476,10 +505,10 @@ void cc_unstable_hasher_digest(cc_hasher *hasher, const void *input,
 CC_ATTRIBUTE_EXPORT
 cc_uint64 cc_unstable_hash(const void *input, cc_size length, cc_uint64 seed) {
 #if PROJECT_CL_HASH_HAS_BASIC_SIMD
-  cc_hasher hasher;
-  cc_initialize_simd_hasher(&hasher, seed);
-  cc_simd_hasher_digest(&hasher, input, length);
-  return cc_finalize_simd_hasher(&hasher);
+  cc_simd_hasher hasher;
+  cc_initialize_simd_hasher_inplace((cc_hasher_handle)&hasher, seed);
+  cc_simd_hasher_digest((cc_hasher_handle)&hasher, input, length);
+  return cc_finalize_simd_hasher_inplace((cc_hasher_handle)&hasher);
 #else
   return cc_stable_hash(input, length, seed);
 #endif
@@ -487,10 +516,10 @@ cc_uint64 cc_unstable_hash(const void *input, cc_size length, cc_uint64 seed) {
 
 CC_ATTRIBUTE_EXPORT
 cc_uint64 cc_stable_hash(const void *input, cc_size length, cc_uint64 seed) {
-  cc_hasher hasher;
-  cc_initialize_stable_hasher(&hasher, seed);
-  cc_stable_hasher_digest(&hasher, input, length);
-  return cc_finalize_stable_hasher(&hasher);
+  cc_stable_hasher hasher;
+  cc_initialize_stable_hasher_inplace((cc_hasher_handle)&hasher, seed);
+  cc_stable_hasher_digest((cc_hasher_handle)&hasher, input, length);
+  return cc_finalize_stable_hasher_inplace((cc_hasher_handle)&hasher);
 }
 
 CC_ATTRIBUTE_EXPORT
