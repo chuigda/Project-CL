@@ -33,9 +33,5 @@
             return CC_ASSERTION_WOULD_FAIL; \
         } \
     })
-
-#define PROJECT_CL_UNUSED(X) ((void)(X))
-#define PROJECT_CL_IS_BIG_ENDIAN() (!*(unsigned char *)&(uint16_t){1})
-
 #endif /* PROJECT_CL_IMPL_H */
 
