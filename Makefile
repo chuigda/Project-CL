@@ -2,7 +2,7 @@ ifndef CC
 	CC = gcc
 endif
 ifndef CFLAGS
-	CFLAGS = -Wall -Wextra -pedantic -Werror -O2 -g $(EXTRA_CFLAGS)
+	CFLAGS = -Wall -Wextra -pedantic -O2 -g $(EXTRA_CFLAGS)
 endif
 
 ifndef WIN32
@@ -56,7 +56,7 @@ define RUN_TEST_ITEM
 endef
 
 .PHONY: test test-log
-test: test-log test_vec
+test: test-log test_vec test_hash
 
 test-log:
 	@echo Running tests
@@ -69,6 +69,11 @@ test_vec: test_vec.bin
 	$(call RUN_TEST_ITEM,test_vec,4,6)
 	$(call RUN_TEST_ITEM,test_vec,5,6)
 	$(call RUN_TEST_ITEM,test_vec,6,6)
+
+.PHONY: test_hash
+test_hash: test_hash.bin
+	$(call RUN_TEST_ITEM,test_hash,1,2)
+	$(call RUN_TEST_ITEM,test_hash,2,2)
 
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))

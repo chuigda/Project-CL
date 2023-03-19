@@ -67,6 +67,7 @@ static inline cc_hash_uint128 cc_hash_uint128_multiply(cc_hash_uint128 a,
 static inline cc_hash_uint128 cc_hash_cast_uint64_to_uint128(cc_uint64 low) {
   cc_hash_uint128 data;
   data.data[PROJECT_CL_IS_BIG_ENDIAN()] = low;
+  data.data[!PROJECT_CL_IS_BIG_ENDIAN()] = 0;
   return data;
 }
 
