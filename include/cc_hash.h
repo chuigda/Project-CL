@@ -27,7 +27,7 @@ CC_ATTRIBUTE_EXPORT
 void cc_unstable_hasher_digest(cc_hasher * hasher, const void * input, cc_size length);
 
 /**
- * Initialize a hasher (Platform dependent).
+ * Initialize a hasher (Platform independent).
  * @param hasher pointer to the hasher to be initialized
  * @param seed seed to do the initialization
  */
