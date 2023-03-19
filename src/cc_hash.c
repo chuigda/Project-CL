@@ -3,6 +3,7 @@
 #include "cc_hash/ssse3.h"
 #include "cc_hash/sve.h"
 #include "cc_hash/vaes.h"
+#include "cc_impl.h"
 #include <cc_hash.h>
 
 /* emulate uint128 for internal use */
