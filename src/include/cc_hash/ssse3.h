@@ -76,7 +76,7 @@ cc_hash_simd_lower_add(cc_hashvec x, cc_uint64 info) {
 
 inline static cc_uint64
 cc_hash_simd_lower_half(cc_hashvec x) {
-    return (cc_uint64)_mm_set_epi64x(x, 0);
+    return (cc_uint64)_mm_extract_epi64(x, 0);
 }
 
 inline static cc_hashvec
