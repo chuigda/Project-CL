@@ -4,8 +4,9 @@
 
 #include <arm_neon.h>
 #include <cc_defs.h>
+#include "cc_hash/common.h"
 #include "cc_impl.h"
-#include "common.h"
+
 
 #define PROJECT_CL_HASH_HAS_BASIC_SIMD     1
 typedef uint8x16_t cc_hashvec;
@@ -50,7 +51,7 @@ cc_hash_simd_shuffle(cc_hashvec x, cc_hashvec table) {
 
 inline static cc_hashvec
 cc_hash_simd_shuffle_mask(void) {
-    return vld1q_u8 (&CC_HASH_SHUFFLE_TABLE[0]);
+    return vld1q_u8 (&PROJECT_CL_HASH_SHUFFLE_TABLE[0]);
 }
 
 inline static cc_hashvec
@@ -79,6 +80,11 @@ cc_hash_simd_lower_add(cc_hashvec x, cc_uint64 info) {
 inline static cc_uint64
 cc_hash_simd_lower_half(cc_hashvec x) {
     return vreinterpretq_u64_u8(x)[0];
+}
+
+inline static cc_hashvec
+cc_hash_simd_xor(cc_hashvec x, cc_hashvec y) {
+    return veorq_u8(x, y);
 }
 
 #endif

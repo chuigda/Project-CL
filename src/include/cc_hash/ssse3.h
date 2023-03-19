@@ -1,11 +1,11 @@
-#ifndef PROJECT_CL_HASH_ASIMD_H
-#define PROJECT_CL_HASH_ASIMD_H
+#ifndef PROJECT_CL_HASH_SSSE3_H
+#define PROJECT_CL_HASH_SSSE3_H
 #ifdef __SSSE3__
 
 #include <immintrin.h>
 #include <cc_defs.h>
-#include "common.h"
-#include "cl_impl.h"
+#include "cc_hash/common.h"
+#include "cc_impl.h"
 
 #define PROJECT_CL_HASH_HAS_BASIC_SIMD     1
 typedef __m128i cc_hashvec;
@@ -48,8 +48,8 @@ cc_hash_simd_shuffle(cc_hashvec x, cc_hashvec table) {
 }
 
 inline static cc_hashvec
-cc_hash_simd_shuffle_mask() {
-    return _mm_load_si128((const __m128i *)&CC_HASH_SHUFFLE_TABLE[0]);
+cc_hash_simd_shuffle_mask(void) {
+    return _mm_load_si128((const __m128i *)&PROJECT_CL_HASH_SHUFFLE_TABLE[0]);
 }
 
 inline static cc_hashvec
@@ -79,5 +79,10 @@ cc_hash_simd_lower_half(cc_hashvec x) {
     return (cc_uint64)_mm_set_epi64x(x, 0);
 }
 
+inline static cc_hashvec
+cc_hash_simd_xor(cc_hashvec x, cc_hashvec y) {
+    return _mm_xor_si128(x, y);
+}
+
 #endif
-#endif //PROJECT_CL_HASH_ASIMD_H
+#endif //PROJECT_CL_HASH_SSSE3_H
