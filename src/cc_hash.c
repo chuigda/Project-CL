@@ -199,7 +199,7 @@ static inline cc_hash_small_data cc_hash_load_small_data(const void *source,
       buffer.data[1] = (cc_uint64)data[0];
     } else {
       buffer.data[0] = 0;
-      buffer.data[1] = 1;
+      buffer.data[1] = 0;
     }
   }
   return buffer;
