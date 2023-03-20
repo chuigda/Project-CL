@@ -241,8 +241,8 @@ cc_uint64 cc_finalize_stable_hasher(cc_hasher_handle hasher) {
 
 static inline cc_uint64 cc_hash_stable_mix_integer(cc_stable_hasher hasher,
                                                    cc_uint64 x, cc_uint64 y) {
-  cc_hash_stable_digest128(&hasher, cc_hash_cast_uint64_to_uint128(x));
-  cc_hash_stable_digest128(&hasher, cc_hash_cast_uint64_to_uint128(y));
+  hasher.buffer = cc_hash_folded_multiply(x ^ hasher.buffer, PROJECT_CL_STABLE_HASH_MULTIPLE);
+  hasher.buffer = cc_hash_folded_multiply(y ^ hasher.buffer, PROJECT_CL_STABLE_HASH_MULTIPLE);
   return cc_finalize_stable_hasher_inplace((cc_hasher_handle)&hasher);
 }
 
@@ -253,7 +253,7 @@ static inline void cc_initialize_stable_hasher_inplace(cc_hasher_handle hasher,
   shasher->pad = PI[1];
   shasher->extra_keys[0] = PI[2];
   shasher->extra_keys[1] = PI[3];
-  cc_hash_stable_digest128(shasher, cc_hash_cast_uint64_to_uint128(seed));
+  shasher->buffer = cc_hash_folded_multiply(seed ^ shasher->buffer, PROJECT_CL_STABLE_HASH_MULTIPLE);
   cc_uint64 mixed[4] = {
       cc_hash_stable_mix_integer(*shasher, PI2[0], PI2[2]),
       cc_hash_stable_mix_integer(*shasher, PI2[1], PI2[3]),
