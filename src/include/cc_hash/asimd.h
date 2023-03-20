@@ -56,7 +56,7 @@ cc_hash_simd_shuffle_mask(void) {
 
 inline static cc_hashvec
 cc_hash_simd_shuffle_add(cc_hashvec x, cc_hashvec y) {
-    return cc_hash_simd_add64(cc_hash_simd_add64(x, cc_hash_simd_shuffle_mask()), y);
+    return cc_hash_simd_add64(cc_hash_simd_shuffle(x, cc_hash_simd_shuffle_mask()), y);
 }
 
 inline static cc_hashvec

@@ -71,7 +71,7 @@ cc_hash_wide_simd_shuffle_mask(void) {
 
 inline static cc_wide_hashvec
 cc_hash_wide_simd_shuffle_add(cc_wide_hashvec x, cc_wide_hashvec y) {
-    return cc_hash_wide_simd_add64(cc_hash_wide_simd_add64(x, cc_hash_wide_simd_shuffle_mask()), y);
+    return cc_hash_wide_simd_add64(cc_hash_wide_simd_shuffle(x, cc_hash_wide_simd_shuffle_mask()), y);
 }
 
 inline static cc_wide_hashvec
