@@ -366,7 +366,7 @@ static inline void cc_simd_hash_digest_hashvec2(cc_simd_hasher *hasher,
     const UTYPE encoded0 = PREFIX##_simd_encode(current0, current1);           \
     const UTYPE encoded1 = PREFIX##_simd_encode(current2, current3);           \
     const UTYPE total = PREFIX##_simd_add64(sum0, sum1);                       \
-    for (size_t i = 0; i < num_lanes / 16; ++i) {                              \
+    for (cc_size i = 0; i < num_lanes / 16; ++i) {                             \
       DTYPE a = PREFIX##_simd_downcast(encoded0, i);                           \
       DTYPE b = PREFIX##_simd_downcast(encoded1, i);                           \
       DTYPE c = PREFIX##_simd_downcast(total, i);                              \
