@@ -12,7 +12,7 @@ typedef __m256i cc_wide_hashvec;
 
 inline static cc_size
 cc_hash_wide_simd_lanes(cc_wide_hashvec ignored) {
-    PROJECT_CL_UNUSED(cc_wide_hashvec);
+    PROJECT_CL_UNUSED(ignored);
     return 32;
 }
 
