@@ -14,6 +14,10 @@
 #   include <stdint.h>
 #endif
 
+#ifndef PROJECT_CL_DONT_USE_WCHAR
+#   include <wchar.h>
+#endif
+
 #ifdef PROJECT_CL_SIZE_TYPE
 typedef PROJECT_CL_SIZE_TYPE cc_size;
 #else
@@ -108,6 +112,42 @@ typedef double cc_f64;
 
 #ifdef PROJECT_CL_FP128_TYPE
 typedef PROJECT_CL_FP128_TYPE cc_f128;
+#endif
+
+#ifdef PROJECT_CL_CHAR_TYPE
+typedef PROJECT_CL_CHAR8_TYPE cc_char;
+#else
+typedef char cc_char;
+#endif
+
+#ifdef PROJECT_CL_SCHAR_TYPE
+typedef PROJECT_CL_SCHAR_TYPE cc_schar;
+#else
+typedef signed char cc_schar;
+#endif
+
+#ifdef PROJECT_CL_UCHAR_TYPE
+typedef PROJECT_CL_UCHAR_TYPE cc_uchar;
+#else
+typedef unsigned char cc_uchar;
+#endif
+
+#ifdef PROJECT_CL_WCHAR_TYPE
+typedef PROJECT_CL_WCHAR_TYPE cc_wchar;
+#else
+typedef wchar_t cc_wchar;
+#endif
+
+#ifdef PROJECT_CL_CHAR16_TYPE
+typedef PROJECT_CL_CHAR16_TYPE cc_char16;
+#else
+typedef cc_uint16 cc_char16;
+#endif
+
+#ifdef PROJECT_CL_CHAR32_TYPE
+typedef PROJECT_CL_CHAR32_TYPE cc_char32;
+#else
+typedef cc_uint32 cc_char32;
 #endif
 
 typedef _Bool (cc_pred)(void *ptr);

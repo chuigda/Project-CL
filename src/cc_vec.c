@@ -69,6 +69,12 @@ void cc_vec_dtor(void *vec) {
     cc_vec_destroy((cc_vec*)vec);
 }
 
+cc_size cc_vec_item_size(cc_vec *vec) {
+    RT_CONTRACT2(vec, 0);
+
+    return vec->item_size;
+}
+
 cc_size cc_vec_size(cc_vec *vec) {
     RT_CONTRACT2(vec, 0)
 
@@ -310,6 +316,11 @@ cc_vec_remove_if2(cc_vec *vec, cc_pred2 pred, void *ctx) {
     }
     vec->size -= removed;
 
+    return CC_NO_ERROR;
+}
+
+cc_error cc_vec_copy(cc_vec* vec, void *buf) {
+    cc_memcpy(buf, vec, vec->size * vec->item_size);
     return CC_NO_ERROR;
 }
 
