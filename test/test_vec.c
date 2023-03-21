@@ -1,6 +1,6 @@
 #include "test_kit.h"
 
-void test1() {
+void test1(void) {
     cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
@@ -18,7 +18,7 @@ void test1() {
     cc_vec_destroy(v);
 }
 
-void test2() {
+void test2(void) {
     cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
@@ -51,7 +51,7 @@ void test2() {
     cc_vec_destroy(v);
 }
 
-void test3() {
+void test3(void) {
     cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
@@ -88,7 +88,7 @@ static inline _Bool test_vec_internal_test4_pred(void *ptr) {
     return *(int*)ptr % 2 == 0;
 }
 
-void test4() {
+void test4(void) {
     cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
@@ -113,7 +113,7 @@ static inline _Bool test_vec_internal_test5_pred(void *ptr) {
     return *(int*)ptr % 2 != 0;
 }
 
-void test5() {
+void test5(void) {
     cc_vec *v = cc_vec_init(sizeof(int), NULL);
     cc_assert(v);
 
@@ -141,7 +141,7 @@ static inline void test_vec_internal_dtor(void *ptr) {
     collected += 1;
 }
 
-void test6() {
+void test6(void) {
     cc_vec *v = cc_vec_init(sizeof(char), test_vec_internal_dtor);
     cc_assert(v);
 

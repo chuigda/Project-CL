@@ -1,0 +1,47 @@
+name: aarch64
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build_job:
+    # The host should always be linux
+    runs-on: ubuntu-latest
+    name: Build on ${{ matrix.arch }} ${{ matrix.identifier }}
+
+    # Run steps on a matrix of 4 arch/distro combinations
+    strategy:
+      matrix:
+        include:
+          - arch: aarch64
+            distro: ubuntu_latest
+            EXTRA_CFLAGS:
+            identifier: generic
+
+          - arch: aarch64
+            distro: ubuntu_latest
+            EXTRA_CFLAGS: -march=armv8-a+aes
+            identifier: asimd
+
+          - arch: aarch64
+            distro: ubuntu_latest
+            EXTRA_CFLAGS: -march=armv9-a+aes+sve2-aes
+            identifier: sve2
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: uraimo/run-on-arch-action@v2
+        name: Build MultiArch
+        id: build
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
+          githubToken: ${{ github.token }}
+          install: |
+            apt-get update -q -y
+            apt-get install -q -y clang-15 build-essential
+          run: |
+            env CC=clang-15 EXTRA_CFLAGS=${{ matrix.EXTRA_CFLAGS }} make test

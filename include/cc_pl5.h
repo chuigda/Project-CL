@@ -26,7 +26,7 @@ typedef enum {
 
 typedef cc_uint32 (cc_pl5_user_fn)(cc_uint32 *values);
 
-cc_pl5_context *cc_pl5_init();
+cc_pl5_context *cc_pl5_init(void);
 
 void cc_pl5_destroy(cc_pl5_context *cx);
 
