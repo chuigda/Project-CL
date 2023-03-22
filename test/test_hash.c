@@ -11,7 +11,10 @@ typedef struct {
 } offset_array;
 
 static inline void
-initialize_offset_array(offset_array* array, cc_size offset, cc_size length) {
+initialize_offset_array(offset_array* array,
+                        cc_size offset,
+                        cc_size length) 
+{
     array->length = length;
     array->base = (uint8_t *)cc_alloc(length + 128);
     cc_size current_offset = ((cc_size)array->base) % 128;
