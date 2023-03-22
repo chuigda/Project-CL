@@ -46,13 +46,18 @@ cc_hash_wide_simd_shuffle(cc_wide_hashvec x, cc_wide_hashvec table) {
 
 inline static cc_wide_hashvec
 cc_hash_wide_simd_shuffle_mask(void) {
-    __m128i mask = _mm_load_si128((const __m128i *)&PROJECT_CL_HASH_SHUFFLE_TABLE[0]);
+    __m128i mask = _mm_load_si128(
+        (const __m128i *)&PROJECT_CL_HASH_SHUFFLE_TABLE[0]
+    );
     return _mm256_broadcastsi128_si256(mask);
 }
 
 inline static cc_wide_hashvec
 cc_hash_wide_simd_shuffle_add(cc_wide_hashvec x, cc_wide_hashvec y) {
-    return cc_hash_wide_simd_add64(cc_hash_wide_simd_shuffle(x, cc_hash_wide_simd_shuffle_mask()), y);
+    return cc_hash_wide_simd_add64(cc_hash_wide_simd_shuffle(
+        x,
+        cc_hash_wide_simd_shuffle_mask()
+    ), y);
 }
 
 inline static cc_wide_hashvec

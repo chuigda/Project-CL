@@ -4,14 +4,17 @@
 #include <cc_defs.h>
 
 #if defined(__has_builtin) && __has_builtin(__builtin_memcpy_inline)
-#define PROJECT_CL_HASH_GENERIC_LOAD(DST, SRC) __builtin_memcpy_inline((DST), (SRC), sizeof(*(DST)))
+#define PROJECT_CL_HASH_GENERIC_LOAD(DST, SRC) \
+    __builtin_memcpy_inline((DST), (SRC), sizeof(*(DST)))
 #elif defined(__has_builtin) && __has_builtin(__builtin_memcpy)
-#define PROJECT_CL_HASH_GENERIC_LOAD(DST, SRC) __builtin_memcpy((DST), (SRC), sizeof(*(DST)))
+#define PROJECT_CL_HASH_GENERIC_LOAD(DST, SRC) \
+    __builtin_memcpy((DST), (SRC), sizeof(*(DST)))
 #else
 
 #include <cc_memory.h>
 
-#define PROJECT_CL_HASH_GENERIC_LOAD(DST, SRC) cc_memcpy((DST), (SRC), sizeof(*(DST)))
+#define PROJECT_CL_HASH_GENERIC_LOAD(DST, SRC) \
+    cc_memcpy((DST), (SRC), sizeof(*(DST)))
 #endif
 
 #if defined(__SSSE3__) || defined(__ARM_FEATURE_AES)

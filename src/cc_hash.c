@@ -26,7 +26,9 @@ static inline cc_uint64 *cc_hash_uint128_high(cc_hash_uint128 *x) {
 }
 
 #ifndef __SIZEOF_INT128__
-static inline void cc_hash_full_mul(cc_uint64 op1, cc_uint64 op2, cc_uint64 *hi,
+static inline void cc_hash_full_mul(cc_uint64 op1,
+                                    cc_uint64 op2,
+                                    cc_uint64 *hi,
                                     cc_uint64 *lo) {
   cc_uint64 u1 = (op1 & 0xffffffff);
   cc_uint64 v1 = (op2 & 0xffffffff);
@@ -48,8 +50,8 @@ static inline void cc_hash_full_mul(cc_uint64 op1, cc_uint64 op2, cc_uint64 *hi,
 }
 #endif
 
-static inline cc_hash_uint128 cc_hash_uint128_multiply(cc_hash_uint128 a,
-                                                       cc_hash_uint128 b) {
+static inline cc_hash_uint128 
+cc_hash_uint128_multiply(cc_hash_uint128 a, cc_hash_uint128 b) {
   cc_hash_uint128 result;
 #ifdef __SIZEOF_INT128__
   result.whole_data = a.whole_data * b.whole_data;
@@ -65,7 +67,8 @@ static inline cc_hash_uint128 cc_hash_uint128_multiply(cc_hash_uint128 a,
   return result;
 }
 
-static inline cc_hash_uint128 cc_hash_cast_uint64_to_uint128(cc_uint64 low) {
+static inline cc_hash_uint128 
+cc_hash_cast_uint64_to_uint128(cc_uint64 low) {
   cc_hash_uint128 data;
   data.data[PROJECT_CL_IS_BIG_ENDIAN()] = low;
   data.data[!PROJECT_CL_IS_BIG_ENDIAN()] = 0;
@@ -76,9 +79,12 @@ static inline cc_uint64 cc_hash_swap_bytes64(cc_uint64 x) {
 #if defined(__has_builtin) && __has_builtin(__builtin_bswap64)
   return __builtin_bswap64(x);
 #else
-  x = ((x << 8) & 0xFF00FF00FF00FF00ULL) | ((x >> 8) & 0x00FF00FF00FF00FFULL);
-  x = ((x << 16) & 0xFFFF0000FFFF0000ULL) | ((x >> 16) & 0x0000FFFF0000FFFFULL);
-  x = ((x << 32) & 0xFFFFFFFF00000000LL) | ((x >> 32) & 0x00000000FFFFFFFFULL);
+  x = ((x << 8) & 0xFF00FF00FF00FF00ULL) | 
+      ((x >> 8) & 0x00FF00FF00FF00FFULL);
+  x = ((x << 16) & 0xFFFF0000FFFF0000ULL) |
+      ((x >> 16) & 0x0000FFFF0000FFFFULL);
+  x = ((x << 32) & 0xFFFFFFFF00000000LL) |
+      ((x >> 32) & 0x00000000FFFFFFFFULL);
   return x;
 #endif
 }
@@ -152,7 +158,8 @@ static inline cc_uint64 cc_hash_rotate_left(cc_uint64 x, cc_uint64 y) {
 #endif
 }
 
-static inline cc_uint64 cc_hash_folded_multiply(cc_uint64 x, cc_uint64 y) {
+static inline cc_uint64 cc_hash_folded_multiply(cc_uint64 x,
+                                                cc_uint64 y) {
   cc_hash_uint128 a = cc_hash_cast_uint64_to_uint128(x);
   cc_hash_uint128 b = cc_hash_cast_uint64_to_uint128(y);
   cc_hash_uint128 c = cc_hash_uint128_multiply(a, b);
@@ -179,14 +186,16 @@ typedef struct {
   cc_uint64 data[2];
 } cc_hash_small_data;
 
-static inline cc_hash_small_data cc_hash_load_small_data(const void *source,
-                                                         cc_size length) {
+static inline cc_hash_small_data
+cc_hash_load_small_data(const void *source, cc_size length) {
   cc_hash_small_data buffer;
   const uint8_t *data = (const uint8_t *)source;
   if (length >= 2) {
     if (length >= 4) {
-      buffer.data[0] = (cc_uint64)cc_hash_load_uint32le(&data[0]);
-      buffer.data[1] = (cc_uint64)cc_hash_load_uint32le(&data[length - 4]);
+      buffer.data[0] = 
+        (cc_uint64)cc_hash_load_uint32le(&data[0]);
+      buffer.data[1] = 
+        (cc_uint64)cc_hash_load_uint32le(&data[length - 4]);
     } else {
       cc_uint16 head = cc_hash_load_uint16le(&data[0]);
       cc_uint8 tail = data[length - 1];
@@ -218,10 +227,14 @@ static inline void cc_hash_stable_digest128(cc_stable_hasher *hasher,
                                             cc_hash_uint128 data) {
   cc_uint64 low = *cc_hash_uint128_low(&data);
   cc_uint64 high = *cc_hash_uint128_high(&data);
-  cc_uint64 combined = cc_hash_folded_multiply(low ^ hasher->extra_keys[0],
-                                               high ^ hasher->extra_keys[1]);
+  cc_uint64 combined = cc_hash_folded_multiply(
+    low ^ hasher->extra_keys[0],
+    high ^ hasher->extra_keys[1]
+  );
   hasher->buffer = cc_hash_rotate_left(
-      (hasher->buffer + hasher->pad) ^ combined, PROJECT_CL_STABLE_HASH_ROTATE);
+    (hasher->buffer + hasher->pad) ^ combined,
+    PROJECT_CL_STABLE_HASH_ROTATE
+  );
 }
 
 static inline cc_uint64
@@ -239,21 +252,33 @@ cc_uint64 cc_finalize_stable_hasher(cc_hasher_handle hasher) {
   return hash;
 }
 
-static inline cc_uint64 cc_hash_stable_mix_integer(cc_stable_hasher hasher,
-                                                   cc_uint64 x, cc_uint64 y) {
-  hasher.buffer = cc_hash_folded_multiply(x ^ hasher.buffer, PROJECT_CL_STABLE_HASH_MULTIPLE);
-  hasher.buffer = cc_hash_folded_multiply(y ^ hasher.buffer, PROJECT_CL_STABLE_HASH_MULTIPLE);
+static inline cc_uint64 
+cc_hash_stable_mix_integer(cc_stable_hasher hasher,
+                           cc_uint64 x,
+                           cc_uint64 y) {
+  hasher.buffer = cc_hash_folded_multiply(
+    x ^ hasher.buffer,
+    PROJECT_CL_STABLE_HASH_MULTIPLE
+  );
+  hasher.buffer = cc_hash_folded_multiply(
+    y ^ hasher.buffer,
+    PROJECT_CL_STABLE_HASH_MULTIPLE
+  );
   return cc_finalize_stable_hasher_inplace((cc_hasher_handle)&hasher);
 }
 
-static inline void cc_initialize_stable_hasher_inplace(cc_hasher_handle hasher,
-                                                       cc_uint64 seed) {
+static inline void 
+cc_initialize_stable_hasher_inplace(cc_hasher_handle hasher,
+                                    cc_uint64 seed) {
   cc_stable_hasher *shasher = (cc_stable_hasher *)hasher;
   shasher->buffer = PI[0];
   shasher->pad = PI[1];
   shasher->extra_keys[0] = PI[2];
   shasher->extra_keys[1] = PI[3];
-  shasher->buffer = cc_hash_folded_multiply(seed ^ shasher->buffer, PROJECT_CL_STABLE_HASH_MULTIPLE);
+  shasher->buffer = cc_hash_folded_multiply(
+    seed ^ shasher->buffer,
+    PROJECT_CL_STABLE_HASH_MULTIPLE
+  );
   cc_uint64 mixed[4] = {
       cc_hash_stable_mix_integer(*shasher, PI2[0], PI2[2]),
       cc_hash_stable_mix_integer(*shasher, PI2[1], PI2[3]),
@@ -323,64 +348,73 @@ static inline void cc_simd_hash_digest_hashvec(cc_simd_hasher *hasher,
 }
 
 static inline void cc_simd_hash_digest_hashvec2(cc_simd_hasher *hasher,
-                                                cc_hashvec x, cc_hashvec y) {
+                                                cc_hashvec x,
+                                                cc_hashvec y) {
   cc_simd_hash_digest_hashvec(hasher, x);
   cc_simd_hash_digest_hashvec(hasher, y);
 }
 
-#define PROJECT_CL_GENERATE_VECTORIZED_DIGEST(UTYPE, DTYPE, PREFIX)            \
-  static inline _Bool PREFIX##_vectorized_digest(                              \
-      cc_simd_hasher *hasher, const cc_uint8 *data, cc_size length) {          \
-    const UTYPE duplicated_key = PREFIX##_simd_broadcast(hasher->key);         \
-    const cc_size num_lanes = PREFIX##_simd_lanes(duplicated_key);             \
-    if (4 * num_lanes >= length)                                               \
-      return 0;                                                                \
-    const UTYPE tail0 = PREFIX##_simd_uload(&data[length - 4 * num_lanes]);    \
-    const UTYPE tail1 = PREFIX##_simd_uload(&data[length - 3 * num_lanes]);    \
-    const UTYPE tail2 = PREFIX##_simd_uload(&data[length - 2 * num_lanes]);    \
-    const UTYPE tail3 = PREFIX##_simd_uload(&data[length - 1 * num_lanes]);    \
-    UTYPE current0 = PREFIX##_simd_encode(duplicated_key, tail0);              \
-    UTYPE current1 = PREFIX##_simd_encode(duplicated_key, tail1);              \
-    UTYPE current2 = PREFIX##_simd_encode(duplicated_key, tail2);              \
-    UTYPE current3 = PREFIX##_simd_encode(duplicated_key, tail3);              \
-    UTYPE sum0 = PREFIX##_simd_shuffle_add(                                    \
-        PREFIX##_simd_add64(duplicated_key, tail0), tail2);                    \
-    UTYPE sum1 = PREFIX##_simd_shuffle_add(                                    \
-        PREFIX##_simd_add64(duplicated_key, tail1), tail3);                    \
-    while (length > 4 * num_lanes) {                                           \
-      const UTYPE head0 = PREFIX##_simd_uload(&data[0 * num_lanes]);           \
-      const UTYPE head1 = PREFIX##_simd_uload(&data[1 * num_lanes]);           \
-      const UTYPE head2 = PREFIX##_simd_uload(&data[2 * num_lanes]);           \
-      const UTYPE head3 = PREFIX##_simd_uload(&data[3 * num_lanes]);           \
-      current0 = PREFIX##_simd_encode(current0, head0);                        \
-      current1 = PREFIX##_simd_encode(current1, head1);                        \
-      current2 = PREFIX##_simd_encode(current2, head2);                        \
-      current3 = PREFIX##_simd_encode(current3, head3);                        \
-      sum0 = PREFIX##_simd_shuffle_add(sum0, head0);                           \
-      sum1 = PREFIX##_simd_shuffle_add(sum1, head1);                           \
-      sum0 = PREFIX##_simd_shuffle_add(sum0, head2);                           \
-      sum1 = PREFIX##_simd_shuffle_add(sum1, head3);                           \
-      data += 4 * num_lanes;                                                   \
-      length -= 4 * num_lanes;                                                 \
-    }                                                                          \
-    const UTYPE encoded0 = PREFIX##_simd_encode(current0, current1);           \
-    const UTYPE encoded1 = PREFIX##_simd_encode(current2, current3);           \
-    const UTYPE total = PREFIX##_simd_add64(sum0, sum1);                       \
-    for (cc_size i = 0; i < num_lanes / 16; ++i) {                             \
-      DTYPE a = PREFIX##_simd_downcast(encoded0, i);                           \
-      DTYPE b = PREFIX##_simd_downcast(encoded1, i);                           \
-      DTYPE c = PREFIX##_simd_downcast(total, i);                              \
-      cc_simd_hash_digest_hashvec2(hasher, a, b);                              \
-      cc_simd_hash_digest_hashvec(hasher, c);                                  \
-    }                                                                          \
-    return 1;                                                                  \
+#define PROJECT_CL_GENERATE_VECTORIZED_DIGEST(UTYPE, DTYPE, PREFIX)     \
+  static inline _Bool PREFIX##_vectorized_digest(                       \
+      cc_simd_hasher *hasher, const cc_uint8 *data, cc_size length) {   \
+    const UTYPE duplicated_key = PREFIX##_simd_broadcast(hasher->key);  \
+    const cc_size num_lanes = PREFIX##_simd_lanes(duplicated_key);      \
+    if (4 * num_lanes >= length)                                        \
+      return 0;                                                         \
+    const UTYPE tail0 =                                                 \
+      PREFIX##_simd_uload(&data[length - 4 * num_lanes]);               \
+    const UTYPE tail1 =                                                 \
+      PREFIX##_simd_uload(&data[length - 3 * num_lanes]);               \
+    const UTYPE tail2 =                                                 \
+      PREFIX##_simd_uload(&data[length - 2 * num_lanes]);               \
+    const UTYPE tail3 =                                                 \
+      PREFIX##_simd_uload(&data[length - 1 * num_lanes]);               \
+    UTYPE current0 = PREFIX##_simd_encode(duplicated_key, tail0);       \
+    UTYPE current1 = PREFIX##_simd_encode(duplicated_key, tail1);       \
+    UTYPE current2 = PREFIX##_simd_encode(duplicated_key, tail2);       \
+    UTYPE current3 = PREFIX##_simd_encode(duplicated_key, tail3);       \
+    UTYPE sum0 = PREFIX##_simd_shuffle_add(                             \
+        PREFIX##_simd_add64(duplicated_key, tail0), tail2);             \
+    UTYPE sum1 = PREFIX##_simd_shuffle_add(                             \
+        PREFIX##_simd_add64(duplicated_key, tail1), tail3);             \
+    while (length > 4 * num_lanes) {                                    \
+      const UTYPE head0 = PREFIX##_simd_uload(&data[0 * num_lanes]);    \
+      const UTYPE head1 = PREFIX##_simd_uload(&data[1 * num_lanes]);    \
+      const UTYPE head2 = PREFIX##_simd_uload(&data[2 * num_lanes]);    \
+      const UTYPE head3 = PREFIX##_simd_uload(&data[3 * num_lanes]);    \
+      current0 = PREFIX##_simd_encode(current0, head0);                 \
+      current1 = PREFIX##_simd_encode(current1, head1);                 \
+      current2 = PREFIX##_simd_encode(current2, head2);                 \
+      current3 = PREFIX##_simd_encode(current3, head3);                 \
+      sum0 = PREFIX##_simd_shuffle_add(sum0, head0);                    \
+      sum1 = PREFIX##_simd_shuffle_add(sum1, head1);                    \
+      sum0 = PREFIX##_simd_shuffle_add(sum0, head2);                    \
+      sum1 = PREFIX##_simd_shuffle_add(sum1, head3);                    \
+      data += 4 * num_lanes;                                            \
+      length -= 4 * num_lanes;                                          \
+    }                                                                   \
+    const UTYPE encoded0 = PREFIX##_simd_encode(current0, current1);    \
+    const UTYPE encoded1 = PREFIX##_simd_encode(current2, current3);    \
+    const UTYPE total = PREFIX##_simd_add64(sum0, sum1);                \
+    for (cc_size i = 0; i < num_lanes / 16; ++i) {                      \
+      DTYPE a = PREFIX##_simd_downcast(encoded0, i);                    \
+      DTYPE b = PREFIX##_simd_downcast(encoded1, i);                    \
+      DTYPE c = PREFIX##_simd_downcast(total, i);                       \
+      cc_simd_hash_digest_hashvec2(hasher, a, b);                       \
+      cc_simd_hash_digest_hashvec(hasher, c);                           \
+    }                                                                   \
+    return 1;                                                           \
   }
 
 PROJECT_CL_GENERATE_VECTORIZED_DIGEST(cc_hashvec, cc_hashvec, cc_hash)
 
 #if PROJECT_CL_HASH_HAS_WIDE_SIMD
 
-PROJECT_CL_GENERATE_VECTORIZED_DIGEST(cc_wide_hashvec, cc_hashvec, cc_hash_wide)
+PROJECT_CL_GENERATE_VECTORIZED_DIGEST(
+  cc_wide_hashvec,
+  cc_hashvec,
+  cc_hash_wide
+)
 
 #endif
 
@@ -393,21 +427,24 @@ cc_finalize_simd_hasher_inplace(cc_hasher_handle hasher) {
   return cc_hash_simd_lower_half(result);
 }
 
-static inline cc_uint64 cc_finalize_simd_hasher(cc_hasher_handle hasher) {
+static inline cc_uint64
+cc_finalize_simd_hasher(cc_hasher_handle hasher) {
   cc_uint64 hash = cc_finalize_simd_hasher_inplace(hasher);
   cc_free(hasher);
   return hash;
 }
 
-static inline cc_uint64 cc_hash_simd_mix_integer(cc_simd_hasher hasher,
-                                                 cc_uint64 x, cc_uint64 y) {
+static inline cc_uint64
+cc_hash_simd_mix_integer(cc_simd_hasher hasher,
+                         cc_uint64 x, cc_uint64 y) {
   cc_simd_hash_digest_hashvec(&hasher, cc_hash_simd_u64x2(x, 0));
   cc_simd_hash_digest_hashvec(&hasher, cc_hash_simd_u64x2(y, 0));
   return cc_finalize_simd_hasher_inplace((cc_hasher_handle)&hasher);
 }
 
-static inline void cc_initialize_simd_hasher_inplace(cc_hasher_handle hasher,
-                                                     cc_uint64 seed) {
+static inline void
+cc_initialize_simd_hasher_inplace(cc_hasher_handle hasher,
+                                  cc_uint64 seed) {
   cc_simd_hasher *vhasher = (cc_simd_hasher *)hasher;
   vhasher->enc = cc_hash_simd_u64x2(PI[0], PI[1]);
   vhasher->sum = cc_hash_simd_u64x2(PI[2], PI[3]);
@@ -424,14 +461,17 @@ static inline void cc_initialize_simd_hasher_inplace(cc_hasher_handle hasher,
   vhasher->key = cc_hash_simd_xor(vhasher->enc, vhasher->sum);
 }
 
-static inline cc_hasher_handle cc_initialize_simd_hasher(cc_uint64 seed) {
+static inline cc_hasher_handle 
+cc_initialize_simd_hasher(cc_uint64 seed) {
   cc_hasher_handle hasher = cc_alloc2(sizeof(cc_simd_hasher), 16);
   cc_initialize_simd_hasher_inplace(hasher, seed);
   return hasher;
 }
 
-static inline void cc_simd_hasher_digest(cc_hasher_handle hasher,
-                                         const void *input, size_t length) {
+static inline void 
+cc_simd_hasher_digest(cc_hasher_handle hasher,
+                      const void *input,
+                      size_t length) {
   cc_simd_hasher *vhasher = (cc_simd_hasher *)hasher;
   const cc_uint8 *data = (const uint8_t *)input;
   vhasher->enc = cc_hash_simd_lower_add(vhasher->enc, length);
@@ -493,7 +533,8 @@ cc_uint64 cc_finalize_unstable_hasher(cc_hasher_handle hasher) {
 }
 
 CC_ATTRIBUTE_EXPORT
-void cc_unstable_hasher_digest(cc_hasher_handle hasher, const void *input,
+void cc_unstable_hasher_digest(cc_hasher_handle hasher,
+                               const void *input,
                                cc_size length) {
 #if PROJECT_CL_HASH_HAS_BASIC_SIMD
   cc_simd_hasher_digest(hasher, input, length);
@@ -503,7 +544,9 @@ void cc_unstable_hasher_digest(cc_hasher_handle hasher, const void *input,
 }
 
 CC_ATTRIBUTE_EXPORT
-cc_uint64 cc_unstable_hash(const void *input, cc_size length, cc_uint64 seed) {
+cc_uint64 cc_unstable_hash(const void *input,
+                           cc_size length,
+                           cc_uint64 seed) {
 #if PROJECT_CL_HASH_HAS_BASIC_SIMD
   cc_simd_hasher hasher;
   cc_initialize_simd_hasher_inplace((cc_hasher_handle)&hasher, seed);
@@ -515,7 +558,9 @@ cc_uint64 cc_unstable_hash(const void *input, cc_size length, cc_uint64 seed) {
 }
 
 CC_ATTRIBUTE_EXPORT
-cc_uint64 cc_stable_hash(const void *input, cc_size length, cc_uint64 seed) {
+cc_uint64 cc_stable_hash(const void *input,
+                         cc_size length,
+                         cc_uint64 seed) {
   cc_stable_hasher hasher;
   cc_initialize_stable_hasher_inplace((cc_hasher_handle)&hasher, seed);
   cc_stable_hasher_digest((cc_hasher_handle)&hasher, input, length);

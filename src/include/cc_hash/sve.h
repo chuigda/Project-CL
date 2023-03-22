@@ -10,7 +10,8 @@
 
 #define PROJECT_CL_HASH_HAS_WIDE_SIMD     1
 typedef svuint8_t cc_wide_hashvec;
-static _Alignas(64) cc_uint8 PROJECT_CL_HASH_EXTENDED_SHUFFLE_TABLE[16 * 16] = {
+static _Alignas(64) cc_uint8 
+PROJECT_CL_HASH_EXTENDED_SHUFFLE_TABLE[16 * 16] = {
         PROJECT_CL_HASH_SHUFFLE_TABLE_GROUP(0),
         PROJECT_CL_HASH_SHUFFLE_TABLE_GROUP(1),
         PROJECT_CL_HASH_SHUFFLE_TABLE_GROUP(2),
@@ -51,12 +52,20 @@ cc_hash_wide_simd_downcast(cc_wide_hashvec data, cc_size idx) {
 
 inline static cc_wide_hashvec
 cc_hash_wide_simd_encode(cc_wide_hashvec x, cc_wide_hashvec y) {
-    return sveor_u8_x(svptrue_b8 (), svaesmc_u8 (svaese_u8 (x, svdup_n_u8(0))), y);
+    return sveor_u8_x(
+        svptrue_b8(),
+        svaesmc_u8(svaese_u8(x, svdup_n_u8(0))),
+        y
+    );
 }
 
 inline static cc_wide_hashvec
 cc_hash_wide_simd_add64(cc_wide_hashvec x, cc_wide_hashvec y) {
-    return svreinterpret_u8_u64(svadd_u64_x(svptrue_b8 (), svreinterpret_u64_u8(x), svreinterpret_u64_u8(y)));
+    return svreinterpret_u8_u64(svadd_u64_x(
+        svptrue_b8(),
+        svreinterpret_u64_u8(x),
+        svreinterpret_u64_u8(y)
+    ));
 }
 
 inline static cc_wide_hashvec
@@ -66,12 +75,18 @@ cc_hash_wide_simd_shuffle(cc_wide_hashvec x, cc_wide_hashvec table) {
 
 inline static cc_wide_hashvec
 cc_hash_wide_simd_shuffle_mask(void) {
-    return svld1_u8 (svptrue_b8 (), (const cc_uint8 *)&PROJECT_CL_HASH_EXTENDED_SHUFFLE_TABLE[0]);
+    return svld1_u8(
+        svptrue_b8(),
+        (const cc_uint8 *)&PROJECT_CL_HASH_EXTENDED_SHUFFLE_TABLE[0]
+    );
 }
 
 inline static cc_wide_hashvec
 cc_hash_wide_simd_shuffle_add(cc_wide_hashvec x, cc_wide_hashvec y) {
-    return cc_hash_wide_simd_add64(cc_hash_wide_simd_shuffle(x, cc_hash_wide_simd_shuffle_mask()), y);
+    return cc_hash_wide_simd_add64(cc_hash_wide_simd_shuffle(
+        x,
+        cc_hash_wide_simd_shuffle_mask()
+    ), y);
 }
 
 inline static cc_wide_hashvec

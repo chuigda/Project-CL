@@ -49,12 +49,17 @@ cc_hash_simd_shuffle(cc_hashvec x, cc_hashvec table) {
 
 inline static cc_hashvec
 cc_hash_simd_shuffle_mask(void) {
-    return _mm_load_si128((const __m128i *)&PROJECT_CL_HASH_SHUFFLE_TABLE[0]);
+    return _mm_load_si128(
+        (const __m128i *)&PROJECT_CL_HASH_SHUFFLE_TABLE[0]
+    );
 }
 
 inline static cc_hashvec
 cc_hash_simd_shuffle_add(cc_hashvec x, cc_hashvec y) {
-    return cc_hash_simd_add64(cc_hash_simd_shuffle(x, cc_hash_simd_shuffle_mask()), y);
+    return cc_hash_simd_add64(cc_hash_simd_shuffle(
+        x,
+        cc_hash_simd_shuffle_mask()
+    ), y);
 }
 
 inline static cc_hashvec

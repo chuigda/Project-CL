@@ -24,7 +24,9 @@ CC_ATTRIBUTE_COLD void cc_abort(void) {
 #   error no valid PROJECT_CL_ABORT_* suboption
 #endif
 
-#if defined(__has_include) && __has_include(<execinfo.h>) && __has_include(<unistd.h>)
+#if defined(__has_include) \
+    && __has_include(<execinfo.h>) \
+    && __has_include(<unistd.h>)
 
 #include <execinfo.h>
 #include <unistd.h>

@@ -33,5 +33,6 @@
             return CC_ASSERTION_WOULD_FAIL; \
         } \
     })
+
 #endif /* PROJECT_CL_IMPL_H */
 
