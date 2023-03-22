@@ -57,7 +57,8 @@ cc_hash_uint128_multiply(cc_hash_uint128 a, cc_hash_uint128 b) {
   result.whole_data = a.whole_data * b.whole_data;
 #else
   cc_uint64 hi, lo;
-  cc_hash_full_mul(*cc_hash_uint128_low(&a), *cc_hash_uint128_low(&b), &hi,
+  cc_hash_full_mul(*cc_hash_uint128_low(&a),
+                   *cc_hash_uint128_low(&b), &hi,
                    &lo);
   hi += (*cc_hash_uint128_high(&a)) * (*cc_hash_uint128_low(&b));
   hi += (*cc_hash_uint128_high(&b)) * (*cc_hash_uint128_low(&a));
@@ -220,8 +221,10 @@ typedef struct {
   cc_uint64 extra_keys[2];
 } cc_stable_hasher;
 
-static const cc_size PROJECT_CL_STABLE_HASH_ROTATE = 23;
-static const cc_size PROJECT_CL_STABLE_HASH_MULTIPLE = 6364136223846793005;
+static const 
+cc_size PROJECT_CL_STABLE_HASH_ROTATE = 23;
+static const 
+cc_size PROJECT_CL_STABLE_HASH_MULTIPLE = 6364136223846793005;
 
 static inline void cc_hash_stable_digest128(cc_stable_hasher *hasher,
                                             cc_hash_uint128 data) {
