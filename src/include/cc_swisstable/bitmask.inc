@@ -1,5 +1,5 @@
-/// @note: WORD_MASK must be defined
-/// @note: WORD_STRIDE must be defined
+/// @note: CC_ST_WORD_MASK must be defined
+/// @note: CC_ST_WORD_STRIDE must be defined
 /// @note: cc_st_bitmask_impl must be defined
 
 #include <cc_assert.h>
@@ -7,13 +7,13 @@
 #include "cc_bits.h"
 
 static inline
-cc_st_bitmask_impl cc_st_word_mask() {
-    return WORD_MASK;
+cc_st_bitmask_impl cc_st_word_mask(void) {
+    return CC_ST_WORD_MASK;
 }
 
 static inline
-cc_size cc_st_word_stride() {
-    return WORD_STRIDE;
+cc_size cc_st_word_stride(void) {
+    return CC_ST_WORD_STRIDE;
 }
 
 typedef struct {
@@ -22,7 +22,7 @@ typedef struct {
 
 static inline
 cc_st_bitmask cc_st_bitmask_invert(cc_st_bitmask bitmask) {
-    bitmask.word ^ cc_st_word_mask();
+    bitmask.word ^= cc_st_word_mask();
     return bitmask;
 }
 

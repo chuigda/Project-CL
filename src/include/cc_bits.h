@@ -9,8 +9,8 @@
   static inline unsigned int cc_leading_zeros_##TARGET_TYPE(TARGET_TYPE x) {   \
     _Static_assert(sizeof(BASE_TYPE) >= sizeof(TARGET_TYPE),                   \
                    #BASE_TYPE "must be wider than " #BASE_TYPE);               \
-    return (x == 0) ? sizeof(TARGET_TYPE) * 8                                  \
-                    : BUILTIN((BASE_TYPE)x) -                                  \
+    return (x == 0) ? sizeof(TARGET_TYPE) * 8u                                 \
+                    : (unsigned int)BUILTIN((BASE_TYPE)x) -                    \
                           (sizeof(BASE_TYPE) - sizeof(TARGET_TYPE)) * 8;       \
   }
 #else
@@ -45,7 +45,8 @@ CC_LEADING_ZEROS_IMPL(cc_uint64, unsigned long long, __builtin_clzll)
   static inline unsigned int cc_trailing_zeros_##TARGET_TYPE(TARGET_TYPE x) {  \
     _Static_assert(sizeof(BASE_TYPE) >= sizeof(TARGET_TYPE), #BASE_TYPE        \
                    " must be wider than or of equal size with " #BASE_TYPE);   \
-    return (x == 0) ? sizeof(TARGET_TYPE) * 8 : BUILTIN((BASE_TYPE)x);         \
+    return (x == 0) ? sizeof(TARGET_TYPE) * 8                                  \
+                    : (unsigned int)BUILTIN((BASE_TYPE)x);                     \
   }
 #else
 #define CC_TRAILING_ZEROS_IMPL(TARGET_TYPE, BASE_TYPE, BUILTIN)                \
@@ -76,7 +77,7 @@ CC_TRAILING_ZEROS_IMPL(cc_uint64, unsigned long long, __builtin_ctzll)
             : cc_leading_zeros_cc_uint8, cc_uint16                             \
             : cc_leading_zeros_cc_uint16, cc_uint32                            \
             : cc_leading_zeros_cc_uint32, cc_uint64                            \
-            : cc_leading_cc_uint64)(X))
+            : cc_leading_zeros_cc_uint64)(X))
 
 #define cc_trailing_zeros(X)                                                   \
   (_Generic((X), cc_uint8                                                      \
