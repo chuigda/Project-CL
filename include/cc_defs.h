@@ -14,10 +14,6 @@
 #   include <stdint.h>
 #endif
 
-#ifndef PROJECT_CL_DONT_USE_WCHAR
-#   include <wchar.h>
-#endif
-
 #ifdef PROJECT_CL_SIZE_TYPE
 typedef PROJECT_CL_SIZE_TYPE cc_size;
 #else
