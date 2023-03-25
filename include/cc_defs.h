@@ -131,4 +131,12 @@ typedef void (cc_dtor)(void *ptr);
 #   define CC_ATTRIBUTE_COLD
 #endif
 
+#ifndef CC_ASSUME(X)
+#   if defined(__has_builtin) && __has_builtin(__builtin_unreachable)
+#       define CC_ASSUME(X) ((X) ? (void) 0 : __builtin_unreachable());
+#   else
+#       define CC_ASSUME(X)
+#   endif
+#endif
+
 #endif /* PROJECT_CL_DEFS_H */
