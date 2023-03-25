@@ -30,6 +30,12 @@ typedef PROJET_CL_ISIZE_TYPE cc_isize;
 typedef ptrdiff_t cc_isize;
 #endif
 
+#ifdef PROJECT_CL_BOOL_TYPE
+typedef PROJET_CL_BOOL_TYPE cc_bool;
+#else
+typedef _Bool cc_bool;
+#endif
+
 #ifdef PROJECT_CL_INT8_TYPE
 typedef PROJECT_CL_INT8_TYPE cc_int8;
 #else
@@ -132,22 +138,10 @@ typedef PROJECT_CL_UCHAR_TYPE cc_uchar;
 typedef unsigned char cc_uchar;
 #endif
 
-#ifdef PROJECT_CL_WCHAR_TYPE
-typedef PROJECT_CL_WCHAR_TYPE cc_wchar;
+#ifdef PROJECT_CL_RUNE_TYPE
+typedef PROJECT_CL_RUNE_TYPE cc_rune;
 #else
-typedef wchar_t cc_wchar;
-#endif
-
-#ifdef PROJECT_CL_CHAR16_TYPE
-typedef PROJECT_CL_CHAR16_TYPE cc_char16;
-#else
-typedef cc_uint16 cc_char16;
-#endif
-
-#ifdef PROJECT_CL_CHAR32_TYPE
-typedef PROJECT_CL_CHAR32_TYPE cc_char32;
-#else
-typedef cc_uint32 cc_char32;
+typedef cc_uint32 cc_rune;
 #endif
 
 typedef _Bool (cc_pred)(void *ptr);
