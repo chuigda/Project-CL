@@ -1,6 +1,14 @@
 #ifndef PROJECT_CL_SWISSTABLE_H
 #define PROJECT_CL_SWISSTABLE_H
 
+#if defined(__SSE2__)
+#include "cc_swisstable/sse2.h"
+#elif defined(__ARM_NEON) && defined(__ORDER_LITTLE_ENDIAN__)
+#include "cc_swisstable/asimd.h"
+#else
+#include "cc_swisstable/generic.h"
+#endif
+
 static inline
 _Bool cc_st_ctrl_is_full(cc_st_ctrl ctrl) {
     return (ctrl & 0x80U) == 0;
