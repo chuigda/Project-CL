@@ -3,7 +3,7 @@
 
 #if defined(__SSE2__)
 #include "cc_swisstable/sse2.h"
-#elif defined(__ARM_NEON) && defined(__ORDER_LITTLE_ENDIAN__)
+#elif defined(__ARM_NEON)
 #include "cc_swisstable/asimd.h"
 #else
 #include "cc_swisstable/generic.h"
