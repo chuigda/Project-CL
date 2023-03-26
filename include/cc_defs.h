@@ -162,4 +162,20 @@ _Bool cc_opaque_predicate(_Bool x) {
 #define PROJECT_CL_UNUSED(X) ((void)(X))
 #define PROJECT_CL_IS_BIG_ENDIAN() (!*(unsigned char *)&(uint16_t){1})
 
+#ifndef CC_LIKELY
+#   if defined(__has_builtin) && __has_builtin(__builtin_expect)
+#       define CC_LIKELY(X) __builtin_expect(!!(X), 1)
+#   else
+#       define CC_LIKELY(X) (X)
+#   endif
+#endif
+
+#ifndef CC_UNLIKELY
+#   if defined(__has_builtin) && __has_builtin(__builtin_expect)
+#       define CC_UNLIKELY(X) __builtin_expect(!!(X), 0)
+#   else
+#       define CC_UNLIKELY(X) (X)
+#   endif
+#endif
+
 #endif /* PROJECT_CL_DEFS_H */
