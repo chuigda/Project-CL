@@ -81,17 +81,18 @@ CC_TRAILING_ZEROS_IMPL(cc_size, unsigned long long, __builtin_ctzll)
             : cc_leading_zeros_cc_uint8, cc_uint16                             \
             : cc_leading_zeros_cc_uint16, cc_uint32                            \
             : cc_leading_zeros_cc_uint32, cc_uint64                            \
-            : cc_leading_zeros_cc_uint64, cc_size                              \
-            : cc_leading_zeros_cc_size)(X))
+            : cc_leading_zeros_cc_uint64)(X))
 
 #define cc_trailing_zeros(X)                                                   \
   (_Generic((X), cc_uint8                                                      \
             : cc_trailing_zeros_cc_uint8, cc_uint16                            \
             : cc_trailing_zeros_cc_uint16, cc_uint32                           \
             : cc_trailing_zeros_cc_uint32, cc_uint64                           \
-            : cc_trailing_zeros_cc_uint64, cc_size                             \
-            : cc_trailing_zeros_cc_size)(X))
+            : cc_trailing_zeros_cc_uint64)(X))
 
 #define cc_next_pow2(X) \
     (1 << (sizeof(X) * 8 - cc_leading_zeros(X - 1)))
+
+#define cc_next_pow2_cc_size(X) \
+    (1 << (sizeof(X) * 8 - cc_leading_zeros_cc_size(X - 1)))
 #endif // PROJECT_CL_BITS_H

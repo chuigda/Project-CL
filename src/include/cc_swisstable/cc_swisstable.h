@@ -48,7 +48,7 @@ cc_size cc_st_capacity_to_buckets(cc_size cap) {
     if (cap < 8) {
         return (cap < 4) ? 4 : 8;
     }
-    return cc_next_pow2(cap * 8);
+    return cc_next_pow2_cc_size(cap * 8);
 }
 
 static inline
