@@ -58,7 +58,7 @@ cc_st_bitmask cc_st_group_mask_full(cc_st_group group) {
             cc_st_group_mask_empty_or_deleted(group));
 }
 
-cc_st_group
+static inline cc_st_group
 cc_st_group_convert_special_to_empty_and_full_to_deleted(
         cc_st_group group) {
     cc_st_group dup = vdup_n_s8((int8_t)0x80);
