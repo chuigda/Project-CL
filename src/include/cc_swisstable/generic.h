@@ -2,7 +2,6 @@
 #define PROJECT_CL_SWISSTABLE_ASIMD_H
 
 #include <cc_defs.h>
-#include <immintrin.h>
 #include "cc_swisstable/common.h"
 #include "cc_bits.h"
 
