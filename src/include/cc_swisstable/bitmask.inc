@@ -38,8 +38,8 @@ cc_size cc_st_bitmask_lzeros(cc_st_bitmask bitmask) {
            / cc_st_word_stride();
 }
 
+static inline
 cc_size cc_st_bitmask_lowest_nz(cc_st_bitmask bitmask) {
-    ;
     CC_ASSUME(bitmask != 0); // but tell the compiler not to emit the checking for zero
     return (cc_size) cc_trailing_zeros(bitmask)
            / cc_st_word_stride();
