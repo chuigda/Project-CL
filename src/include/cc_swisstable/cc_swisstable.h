@@ -15,6 +15,10 @@
 #include <cc_alloc.h>
 #include <cc_memory.h>
 
+#ifndef CC_SWISSTABLE_STACK_ALLOC_THRESHOLD
+#define CC_SWISSTABLE_STACK_ALLOC_THRESHOLD 64
+#endif
+
 static inline
 _Bool cc_st_ctrl_is_full(cc_st_ctrl ctrl) {
     return (ctrl & 0x80U) == 0;
@@ -188,7 +192,7 @@ typedef struct {
 } cc_swisstable;
 
 static inline
-_Bool cc_swisstable_is_valid(cc_swisstable *table) {
+_Bool cc_swisstable_is_valid(const cc_swisstable *table) {
     return table->ctrl != NULL;
 }
 
@@ -299,7 +303,7 @@ cc_swisstable cc_swisstable_create_with_capacity(
 }
 
 static inline
-_Bool cc_swisstable_is_empty_singleton(cc_swisstable *table) {
+_Bool cc_swisstable_is_empty_singleton(const cc_swisstable *table) {
     return table->ctrl == (cc_st_ctrl *) &CC_ST_CONST_EMPTY_GROUP[0];
 }
 
@@ -321,27 +325,29 @@ void cc_swisstable_destroy(cc_swisstable *table) {
 }
 
 static inline
-cc_size cc_swisstable_num_of_buckets(cc_swisstable *table) {
+cc_size cc_swisstable_num_of_buckets(const cc_swisstable *table) {
     return table->bucket_mask + 1;
 }
 
 static inline
-cc_size cc_swisstable_num_of_ctrl_bytes(cc_swisstable *table) {
+cc_size cc_swisstable_num_of_ctrl_bytes(const cc_swisstable *table) {
     return cc_swisstable_num_of_buckets(table) + sizeof(cc_st_group);
 }
 
 static inline
-void *cc_swisstable_data_end(cc_swisstable *table) {
+void *cc_swisstable_data_end(const cc_swisstable *table) {
     return table->ctrl;
 }
 
 static inline
-void *cc_swisstable_data_begin(cc_swisstable *table) {
+void *cc_swisstable_data_begin(const cc_swisstable *table) {
     return table->ctrl - cc_swisstable_num_of_buckets(table);
 }
 
 static inline
-cc_st_bucket cc_swisstable_bucket_at(cc_swisstable *table, cc_size index) {
+cc_st_bucket cc_swisstable_bucket_at(
+        const cc_swisstable *table, cc_size index
+) {
     return cc_st_bucket_create(
             table->ctrl,
             index,
@@ -351,7 +357,7 @@ cc_st_bucket cc_swisstable_bucket_at(cc_swisstable *table, cc_size index) {
 
 static inline
 cc_size cc_swisstable_bucket_index(
-        cc_swisstable const *table,
+        const cc_swisstable *table,
         cc_st_bucket const *bucket) {
     return (bucket->ptr - table->ctrl) / table->element_size;
 }
@@ -386,7 +392,7 @@ void cc_swisstable_set_ctrl(
 
 static inline
 cc_st_probe_seq cc_swisstable_probe_seq(
-        cc_swisstable *table,
+        const cc_swisstable *table,
         cc_st_hash hash
 ) {
     return cc_st_probe_seq_create(
@@ -396,7 +402,7 @@ cc_st_probe_seq cc_swisstable_probe_seq(
 
 static inline
 cc_size cc_swisstable_proper_insert_position(
-        cc_swisstable *table,
+        const cc_swisstable *table,
         cc_size index) {
     // In tables smaller than the group width, trailing control
     // bytes outside the range of the table are filled with
@@ -418,7 +424,7 @@ cc_size cc_swisstable_proper_insert_position(
 
 static inline
 size_t cc_swisstable_find_insert_slot(
-        cc_swisstable *table,
+        const cc_swisstable *table,
         cc_st_hash hash
 ) {
     cc_st_probe_seq seq = cc_swisstable_probe_seq(table, hash);
@@ -437,7 +443,7 @@ size_t cc_swisstable_find_insert_slot(
 
 static inline
 cc_st_bucket cc_swisstable_find_with_hash(
-        cc_swisstable *table,
+        const cc_swisstable *table,
         cc_st_hash hash,
         void *key,
         cc_pred2 eq) {
@@ -462,6 +468,308 @@ cc_st_bucket cc_swisstable_find_with_hash(
 
         cc_st_probe_seq_move_next(&seq, table->bucket_mask);
     }
+}
+
+static inline
+void cc_swisstable_set_ctrl_h2(
+        cc_swisstable *table,
+        cc_size index,
+        cc_st_hash hash) {
+    cc_swisstable_set_ctrl(table, index, cc_st_level2_hash(hash));
+}
+
+static inline
+cc_st_ctrl cc_swisstable_replace_ctrl_h2(
+        cc_swisstable *table,
+        cc_size index,
+        cc_st_hash hash) {
+    cc_st_ctrl old = table->ctrl[index];
+    cc_swisstable_set_ctrl_h2(table, index, hash);
+    return old;
+}
+
+static inline
+_Bool cc_swisstable_is_bucket_full(
+        const cc_swisstable *table,
+        cc_size index
+) {
+    return cc_st_ctrl_is_full(table->ctrl[index]);
+}
+
+typedef struct {
+    size_t index;
+    cc_st_ctrl prev_ctrl;
+} cc_st_slot;
+
+static inline
+cc_st_slot cc_swisstable_prepare_insert_slot(
+        cc_swisstable *table,
+        cc_st_hash hash
+) {
+    cc_st_slot slot;
+    slot.index = cc_swisstable_find_insert_slot(table, hash);
+    slot.prev_ctrl = cc_swisstable_replace_ctrl_h2(table, slot.index, hash);
+    return slot;
+}
+
+static inline
+void cc_swisstable_prepare_rehash_inplace(
+        cc_swisstable *table
+) {
+    // convert full to deleted, deleted to empty s.t. we can use
+    // deleted as an indicator for rehash
+    for (cc_size i = 0; i < cc_swisstable_num_of_buckets(table); i += sizeof(cc_st_group)) {
+        cc_st_group group = cc_st_load_group_aligned(&table->ctrl[i]);
+        cc_st_group converted =
+                cc_st_group_convert_special_to_empty_and_full_to_deleted(group);
+        cc_st_store_group_aligned(&table->ctrl[i], converted);
+    }
+
+    // handle the cases when table size is smaller than group size
+    if (cc_swisstable_num_of_buckets(table) < sizeof(cc_st_group)) {
+        cc_memcpy(
+                &table->ctrl[sizeof(cc_st_group)],
+                &table->ctrl[0],
+                cc_swisstable_num_of_buckets(table));
+    } else {
+#if defined(__has_builtin) && __has_builtin(__builtin_memcpy_inline)
+        __builtin_memcpy_inline(
+                &table->ctrl[cc_swisstable_num_of_buckets(table)],
+                &table->ctrl[0],
+                sizeof(cc_st_group));
+#elif defined(__has_builtin) && __has_builtin(__builtin_memcpy)
+        __builtin_memcpy(
+                &table->ctrl[cc_swisstable_num_of_buckets(table)],
+                &table->ctrl[0],
+                sizeof(cc_st_group));
+#else
+        for (cc_size i = 0; i < sizeof(cc_st_group); i++) {
+            table->ctrl[cc_swisstable_num_of_buckets(table) + i] =
+                    table->ctrl[i];
+        }
+#endif
+    }
+}
+
+static inline
+void cc_swisstable_record_insertion_at(
+        cc_swisstable *table,
+        cc_size index,
+        cc_st_ctrl prev_ctrl,
+        cc_st_hash hash
+) {
+    table->growth_left -= cc_st_ctrl_special_is_empty(prev_ctrl) ? 1 : 0;
+    cc_swisstable_set_ctrl_h2(table, index, hash);
+    table->items++;
+}
+
+static inline
+_Bool cc_swisstable_is_in_same_group(
+        const cc_swisstable *table,
+        cc_size index,
+        cc_size new_index,
+        cc_st_hash hash
+) {
+    cc_size probe_position = cc_swisstable_probe_seq(table, hash).position;
+    cc_size positions[2] = {
+            (index - probe_position) & table->bucket_mask / sizeof(cc_st_group),
+            (new_index - probe_position) & table->bucket_mask / sizeof(cc_st_group),
+    };
+    return positions[0] == positions[1];
+}
+
+static inline
+cc_swisstable cc_swisstable_prepare_resize(
+        const cc_swisstable *table,
+        cc_size capacity
+) {
+    cc_swisstable new_table = cc_swisstable_create_with_capacity(
+            table->element_size,
+            table->element_alignment,
+            capacity);
+    if (CC_LIKELY(cc_swisstable_is_valid(&new_table))) {
+        new_table.growth_left -= table->items;
+        new_table.items += table->items;
+    }
+    return new_table;
+}
+
+typedef struct {
+    void *state;
+
+    cc_st_hash (*hash)(void *state, const void *key, cc_size key_size);
+} cc_st_hasher;
+
+static inline
+_Bool cc_swisstable_rehash_inplace(
+        cc_swisstable *table,
+        cc_st_hasher hasher
+) {
+    void *swap_buffer = NULL;
+    _Bool swap_buffer_is_on_heap = 0;
+#if defined(__has_builtin) && __has_builtin(__builtin_alloca)
+    if (table->element_size <= CC_SWISSTABLE_STACK_ALLOC_THRESHOLD) {
+        swap_buffer = __builtin_alloca(table->element_size);
+    }
+#endif
+    if (swap_buffer == NULL) {
+        swap_buffer = cc_alloc(table->element_size);
+        swap_buffer_is_on_heap = 1;
+    }
+
+    if (swap_buffer == NULL) {
+        return 0;
+    }
+
+    cc_swisstable_prepare_rehash_inplace(table);
+    for (cc_size idx = 0; idx < cc_swisstable_num_of_buckets(table); ++idx) {
+        if (table->ctrl[idx] != CC_ST_DELETED) {
+            continue;
+        }
+
+        cc_st_bucket bucket = cc_swisstable_bucket_at(table, idx);
+
+        while (1) {
+            cc_st_hash hash = hasher.hash(hasher.state, cc_st_bucket_get(bucket), table->element_size);
+            size_t new_idx = cc_swisstable_find_insert_slot(table, hash);
+            // Probing works by scanning through all of the control
+            // bytes in groups, which may not be aligned to the group
+            // size. If both the new and old position fall within the
+            // same unaligned group, then there is no benefit in moving
+            // it and we can just continue to the next item.
+            if (CC_LIKELY(cc_swisstable_is_in_same_group(table, idx, new_idx, hash))) {
+                cc_swisstable_set_ctrl_h2(table, idx, hash);
+                break; // continue outer loop
+            }
+
+            cc_st_bucket new_bucket = cc_swisstable_bucket_at(table, new_idx);
+            cc_st_ctrl prev_ctrl = cc_swisstable_replace_ctrl_h2(table, new_idx, hash);
+
+            if (prev_ctrl == CC_ST_EMPTY) {
+                cc_swisstable_set_ctrl(table, idx, CC_ST_EMPTY);
+                cc_memcpy(
+                        cc_st_bucket_get(new_bucket),
+                        cc_st_bucket_get(bucket),
+                        table->element_size);
+                break; // continue outer loop
+            }
+
+            cc_memcpy(swap_buffer, cc_st_bucket_get(new_bucket), table->element_size);
+            cc_memcpy(cc_st_bucket_get(new_bucket), cc_st_bucket_get(bucket), table->element_size);
+            cc_memcpy(cc_st_bucket_get(bucket), swap_buffer, table->element_size);
+        }
+    }
+
+    table->growth_left = cc_st_bucket_mask_to_capacity(table->bucket_mask) - table->items;
+
+    if (swap_buffer_is_on_heap) {
+        cc_free(swap_buffer);
+    }
+    return 1;
+}
+
+static inline
+_Bool cc_swisstable_resize(
+        cc_swisstable *table,
+        cc_size new_capacity,
+        cc_st_hasher hasher
+) {
+    cc_swisstable new_table =
+            cc_swisstable_prepare_resize(table, new_capacity);
+    if (CC_UNLIKELY(!cc_swisstable_is_valid(&new_table)))
+        return 0;
+
+    for (cc_size i = 0; i < cc_swisstable_num_of_buckets(table); ++i) {
+        if (!cc_swisstable_is_bucket_full(table, i))
+            continue;
+
+        cc_st_bucket bucket = cc_swisstable_bucket_at(table, i);
+        cc_st_hash hash = hasher.hash(
+                hasher.state, cc_st_bucket_get(bucket), table->element_size);
+
+        // We can use a simpler version of insert() here since:
+        // - there are no DELETED entries.
+        // - we know there is enough space in the table.
+        // - all elements are unique.
+        cc_st_slot slot =
+                cc_swisstable_prepare_insert_slot(&new_table, hash);
+        cc_st_bucket new_bucket =
+                cc_swisstable_bucket_at(&new_table, slot.index);
+
+        cc_memcpy(
+                cc_st_bucket_get(new_bucket),
+                cc_st_bucket_get(bucket),
+                table->element_size);
+    }
+
+    cc_swisstable_destroy(table);
+    *table = new_table;
+
+    return 1;
+}
+
+static inline
+_Bool cc_swisstable_reserve_rehash(
+        cc_swisstable *table,
+        cc_size additional,
+        cc_st_hasher hasher
+) {
+    cc_st_safe_size checked_new_items =
+            cc_st_safe_size_add(
+                    cc_st_safe_size_create(table->items),
+                    cc_st_safe_size_create(additional));
+
+    if (CC_UNLIKELY(!cc_st_safe_size_is_valid(checked_new_items)))
+        return 0;
+
+    cc_size new_items = (cc_size) checked_new_items;
+    cc_size full_capacity = cc_st_bucket_mask_to_capacity(table->bucket_mask);
+
+    if (new_items <= full_capacity / 2)
+        return cc_swisstable_rehash_inplace(table, hasher);
+
+    if (CC_UNLIKELY(full_capacity == cc_st_max_safe_size() - 1)) {
+        return 0;
+    }
+
+    cc_size new_capacity =
+            new_items > (full_capacity + 1) ? new_items : (full_capacity + 1);
+    return cc_swisstable_resize(table, new_capacity, hasher);
+}
+
+static inline
+cc_st_bucket cc_swisstable_insert_at(
+        cc_swisstable *table,
+        cc_size index,
+        cc_st_hash hash,
+        const void *element,
+        cc_st_hasher hasher
+) {
+    cc_size prev_ctrl = table->ctrl[index];
+
+    // If we reach full load factor:
+    //
+    //   - When deletion is allowed and the found slot is deleted, then it is
+    //     okay to insert.
+    //   - Otherwise, it means it is an empty slot and such insertion will
+    //     invalidate the load factor constraints. Thus, we need to rehash
+    //     the table. There are several cases:
+    //
+    //       - we may be able to rehash the table in
+    //         place if the total item is less than half of the table.
+    //       - we may be able to grow the table.
+    if (CC_UNLIKELY(table->growth_left == 0 && cc_st_ctrl_special_is_empty(prev_ctrl))) {
+        if (!cc_swisstable_reserve_rehash(table, 1, hasher))
+            return cc_st_bucket_create(NULL, 0, table->element_size);
+        index = cc_swisstable_find_insert_slot(table, hash);
+    }
+
+    cc_swisstable_record_insertion_at(table, index, prev_ctrl, hash);
+
+    cc_st_bucket bucket = cc_swisstable_bucket_at(table, index);
+    cc_memcpy(cc_st_bucket_get(bucket), element, table->element_size);
+
+    return bucket;
 }
 
 #endif // PROJECT_CL_SWISSTABLE_H
