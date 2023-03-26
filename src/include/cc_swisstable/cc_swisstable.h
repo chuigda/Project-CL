@@ -435,4 +435,33 @@ size_t cc_swisstable_find_insert_slot(
     }
 }
 
+static inline
+cc_st_bucket cc_swisstable_find_with_hash(
+        cc_swisstable *table,
+        cc_st_hash hash,
+        void *key,
+        cc_pred2 eq) {
+    cc_st_ctrl h2_hash = cc_st_level2_hash(hash);
+    cc_st_probe_seq seq = cc_swisstable_probe_seq(table, hash);
+    while (1) {
+        cc_st_group group = cc_st_load_group(&table->ctrl[seq.position]);
+        cc_st_bitmask_iter iter = cc_st_group_match_ctrl(group, h2_hash);
+        while (cc_st_bitmask_iter_nonzero(&iter)) {
+            cc_size bit = cc_st_bitmask_iter_get_lowest(&iter);
+            cc_size index = (seq.position + bit) & table->bucket_mask;
+            cc_st_bucket bucket = cc_swisstable_bucket_at(table, index);
+            if (CC_LIKELY(eq(cc_st_bucket_get(bucket), key))) {
+                return bucket;
+            }
+            cc_st_bitmask_iter_rm_lowest(&iter);
+        }
+
+        if (CC_LIKELY(cc_st_bitmask_any(cc_st_group_mask_empty(group)))) {
+            cc_st_bucket_create(table->ctrl, 0, table->element_size);
+        }
+
+        cc_st_probe_seq_move_next(&seq, table->bucket_mask);
+    }
+}
+
 #endif // PROJECT_CL_SWISSTABLE_H
