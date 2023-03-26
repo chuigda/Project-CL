@@ -178,4 +178,14 @@ _Bool cc_opaque_predicate(_Bool x) {
 #   endif
 #endif
 
+#ifndef CC_ATTRIBUTE_ALWAYS_INLINE
+#   if defined(__has_attribute) && __has_attribute(always_inline)
+#       define CC_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline))
+#   elif defined(_MSC_VER)
+#       define CC_ATTRIBUTE_ALWAYS_INLINE __forceinline
+#   else
+#       define CC_ATTRIBUTE_ALWAYS_INLINE
+#   endif
+#endif
+
 #endif /* PROJECT_CL_DEFS_H */
