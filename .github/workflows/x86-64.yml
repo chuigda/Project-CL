@@ -12,6 +12,7 @@ jobs:
       matrix:
         include:
           - EXTRA_CFLAGS: -march=native
+          - EXTRA_CFLAGS: -march=native -DNDEBUG
           - EXTRA_CFLAGS: -march=native -fsanitize=address
           - EXTRA_CFLAGS: -march=native -fsanitize=undefined
     runs-on: ubuntu-latest

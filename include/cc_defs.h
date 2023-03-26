@@ -3,15 +3,21 @@
 
 #if (defined(__has_include) && __has_include(<cc_cfg.h>)) \
     || PROJECT_CL_CFG
+
 #   include <cc_cfg.h>
+
 #endif
 
 #ifndef PROJECT_CL_DONT_USE_STDDEF
+
 #   include <stddef.h>
+
 #endif
 
 #ifndef PROJECT_CL_DONT_USE_STDINT
+
 #   include <stdint.h>
+
 #endif
 
 #ifdef PROJECT_CL_SIZE_TYPE
@@ -111,7 +117,9 @@ typedef PROJECT_CL_FP128_TYPE cc_f128;
 #endif
 
 typedef _Bool (cc_pred)(void *ptr);
+
 typedef _Bool (cc_pred2)(void *ptr, void *ctx);
+
 typedef void (cc_dtor)(void *ptr);
 
 #if defined(__has_attribute) && !defined(PROJECT_CL_DONT_PROBE_ATTRIBUTE)
@@ -132,11 +140,23 @@ typedef void (cc_dtor)(void *ptr);
 #endif
 
 #ifndef CC_ASSUME
-#   if defined(__has_builtin) && __has_builtin(__builtin_unreachable)
-#       define CC_ASSUME(X) ((X) ? (void) 0 : __builtin_unreachable());
+#   if defined(__has_builtin) && __has_builtin(__builtin_assume)
+#       define CC_ASSUME(X) __builtin_assume(X)
+#   elif defined(__has_builtin) && __has_builtin(__builtin_unreachable)
+#       define CC_ASSUME(X) ((X) ? (void) 0 : __builtin_unreachable())
+#   elif defined(_MSC_VER)
+#       define CC_ASSUME(X) __assume(X)
 #   else
 #       define CC_ASSUME(X)
 #   endif
 #endif
+
+extern void cc_blackhole_(char volatile *ptr);
+
+static inline
+_Bool cc_opaque_predicate(_Bool x) {
+    cc_blackhole_((char volatile *) &x);
+    return x;
+}
 
 #endif /* PROJECT_CL_DEFS_H */

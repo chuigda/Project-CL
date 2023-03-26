@@ -3,12 +3,12 @@
 
 #include <cc_defs.h>
 
-#if defined(__has_builtin) && __has_builtin(__builtin_clz) &&                  \
+#if defined(__has_builtin) && __has_builtin(__builtin_clz) && \
     __has_builtin(__builtin_clzl) && __has_builtin(__builtin_clzll)
 #define CC_LEADING_ZEROS_IMPL(TARGET_TYPE, BASE_TYPE, BUILTIN)                 \
   static inline unsigned int cc_leading_zeros_##TARGET_TYPE(TARGET_TYPE x) {   \
     _Static_assert(sizeof(BASE_TYPE) >= sizeof(TARGET_TYPE),                   \
-                   #BASE_TYPE "must be wider than " #BASE_TYPE);               \
+#BASE_TYPE "must be wider than " #BASE_TYPE);               \
     return (x == 0) ? sizeof(TARGET_TYPE) * 8u                                 \
                     : (unsigned int)BUILTIN((BASE_TYPE)x) -                    \
                           (sizeof(BASE_TYPE) - sizeof(TARGET_TYPE)) * 8;       \
@@ -37,9 +37,11 @@ CC_LEADING_ZEROS_IMPL(cc_uint32, unsigned long, __builtin_clzl)
 
 CC_LEADING_ZEROS_IMPL(cc_uint64, unsigned long long, __builtin_clzll)
 
+CC_LEADING_ZEROS_IMPL(cc_size, unsigned long long, __builtin_clzll)
+
 #undef CC_LEADING_ZEROS_IMPL
 
-#if defined(__has_builtin) && __has_builtin(__builtin_ctz) &&                  \
+#if defined(__has_builtin) && __has_builtin(__builtin_ctz) && \
     __has_builtin(__builtin_ctzl) && __has_builtin(__builtin_ctzll)
 #define CC_TRAILING_ZEROS_IMPL(TARGET_TYPE, BASE_TYPE, BUILTIN)                \
   static inline unsigned int cc_trailing_zeros_##TARGET_TYPE(TARGET_TYPE x) {  \
@@ -70,6 +72,8 @@ CC_TRAILING_ZEROS_IMPL(cc_uint32, unsigned long, __builtin_ctzl)
 
 CC_TRAILING_ZEROS_IMPL(cc_uint64, unsigned long long, __builtin_ctzll)
 
+CC_TRAILING_ZEROS_IMPL(cc_size, unsigned long long, __builtin_ctzll)
+
 #undef CC_TRAILING_ZEROS_IMPL
 
 #define cc_leading_zeros(X)                                                    \
@@ -77,13 +81,17 @@ CC_TRAILING_ZEROS_IMPL(cc_uint64, unsigned long long, __builtin_ctzll)
             : cc_leading_zeros_cc_uint8, cc_uint16                             \
             : cc_leading_zeros_cc_uint16, cc_uint32                            \
             : cc_leading_zeros_cc_uint32, cc_uint64                            \
-            : cc_leading_zeros_cc_uint64)(X))
+            : cc_leading_zeros_cc_uint64, cc_size                              \
+            : cc_leading_zeros_cc_size)(X))
 
 #define cc_trailing_zeros(X)                                                   \
   (_Generic((X), cc_uint8                                                      \
             : cc_trailing_zeros_cc_uint8, cc_uint16                            \
             : cc_trailing_zeros_cc_uint16, cc_uint32                           \
             : cc_trailing_zeros_cc_uint32, cc_uint64                           \
-            : cc_trailing_zeros_cc_uint64)(X))
+            : cc_trailing_zeros_cc_uint64, cc_size                             \
+            : cc_trailing_zeros_cc_size)(X))
 
+#define cc_next_pow2(X) \
+    (1 << (sizeof(X) * 8 - cc_leading_zeros(X - 1)))
 #endif // PROJECT_CL_BITS_H
