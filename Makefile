@@ -2,7 +2,7 @@ ifndef CC
 	CC = gcc
 endif
 ifndef CFLAGS
-	CFLAGS = -Wall -Wextra -pedantic -O2 -g $(EXTRA_CFLAGS)
+	CFLAGS = -Wall -Wextra -pedantic -O2 -g $(EXTRA_CFLAGS) -march=armv8-a+nosimd
 endif
 
 ifndef WIN32
