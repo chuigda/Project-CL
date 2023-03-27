@@ -54,7 +54,7 @@ static inline cc_st_group
 cc_st_group_convert_special_to_empty_and_full_to_deleted(cc_st_group group) {
   cc_st_group zero = _mm_setzero_si128();
   cc_st_group special = _mm_cmpgt_epi8(zero, group);
-  cc_st_group converted = _mm_or_si128(special, _mm_set1_epi8(0x80u));
+  cc_st_group converted = _mm_or_si128(special, _mm_set1_epi8((cc_int8)0x80u));
   return converted;
 }
 

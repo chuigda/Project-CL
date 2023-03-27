@@ -682,7 +682,7 @@ cc_swisstable_iter cc_st_iter_create(
     iter.element_size = element_size;
     iter.elems = elems;
     iter.next = ctrl + sizeof(cc_st_group);
-    *(cc_st_bitmask_iter *) (&iter.opaque) = bit_iter;
+    *(cc_st_bitmask_iter *) iter.opaque = bit_iter;
     return iter;
 }
 

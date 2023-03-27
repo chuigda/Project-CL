@@ -53,6 +53,7 @@ void bfs_grow(brutal_force_set *set) {
     cc_uint64 *data =
             (cc_uint64 * )(cc_alloc(sizeof(cc_uint64) * set->capacity * 2));
     cc_memcpy(data, set->data, sizeof(cc_uint64) * set->size);
+    cc_free(set->data);
     set->capacity *= 2;
     set->data = data;
 }
