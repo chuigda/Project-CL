@@ -29,7 +29,7 @@ typedef struct {
     cc_uint8 *next;
     cc_size element_size;
     cc_size elems;
-    cc_uint64 opaque[1];
+    cc_uint64 opaque;
 } cc_swisstable_iter;
 
 void *cc_swisstable_insert(cc_swisstable *table, const void *element,

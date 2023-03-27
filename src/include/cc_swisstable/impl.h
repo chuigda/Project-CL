@@ -682,7 +682,7 @@ cc_swisstable_iter cc_st_iter_create(
     iter.element_size = element_size;
     iter.elems = elems;
     iter.next = ctrl + sizeof(cc_st_group);
-    *(cc_st_bitmask_iter *) iter.opaque = bit_iter;
+    iter.opaque = (cc_uint64) bit_iter.mask;
     return iter;
 }
 
@@ -692,16 +692,17 @@ cc_st_bucket cc_st_iter_next_unchecked(
         cc_swisstable_iter *iter
 ) {
     while (1) {
-        cc_st_bitmask_iter *bit_iter = (cc_st_bitmask_iter *) &iter->opaque;
-        if (cc_st_bitmask_any(bit_iter->mask)) {
-            cc_size index = cc_st_bitmask_lowest_nz(bit_iter->mask);
-            cc_st_bitmask_iter_rm_lowest(bit_iter);
+        cc_st_bitmask_iter bit_iter;
+        bit_iter.mask = (cc_st_bitmask) iter->opaque;
+        if (cc_st_bitmask_any(bit_iter.mask)) {
+            cc_size index = cc_st_bitmask_lowest_nz(bit_iter.mask);
+            cc_st_bitmask_iter_rm_lowest(&bit_iter);
             return cc_st_bucket_create(
                     (cc_st_ctrl *) iter->bucket_ptr,
                     index,
                     iter->element_size);
         }
-        bit_iter->mask =
+        iter->opaque = (cc_uint64)
                 cc_st_group_mask_full(cc_st_load_group(iter->next)) & cc_st_word_mask();
         iter->next += sizeof(cc_st_group);
         iter->bucket_ptr = cc_st_bucket_create(
