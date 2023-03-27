@@ -167,7 +167,7 @@ typedef enum {
     TEST_ACTION_MAX = 3
 } test_action;
 
-random_state default_random_state() {
+random_state default_random_state(void) {
     random_state state;
     state.data = ((cc_uint64)default_random_state) ^ 0x20E6F213CD45A379ULL;
     return state;
