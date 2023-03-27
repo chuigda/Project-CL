@@ -30,7 +30,7 @@ static inline cc_st_safe_size cc_st_safe_size_add(cc_st_safe_size a,
     return -1;
   }
   // both are positive. if overflow ever happens, it will be negative.
-  return a + b;
+  return (cc_st_safe_size)((cc_size)a + (cc_size)b);
 }
 
 static inline cc_st_safe_size cc_st_safe_size_mul(cc_st_safe_size a,

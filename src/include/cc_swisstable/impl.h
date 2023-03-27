@@ -145,7 +145,7 @@ CC_ATTRIBUTE_ALWAYS_INLINE
 static inline cc_st_bucket cc_st_bucket_create(cc_st_ctrl *base, cc_size index,
                                                cc_size element_size) {
     cc_st_bucket bucket;
-    bucket.ptr = base - index * element_size;
+    bucket.ptr = base ? base - index * element_size : NULL;
     bucket.element_size = element_size;
     return bucket;
 }
