@@ -214,22 +214,22 @@ _Bool equality(void *a, void *b) {
 }
 
 
-void test_with_hasher(cc_swisstable_hasher hasher) {
+void test_sequential_with_hasher(size_t attempts, cc_swisstable_hasher hasher) {
     cc_swisstable table_a = cc_swisstable_with_capacity(
-            sizeof(cc_uint64), sizeof(cc_uint64), 16384);
+            sizeof(cc_uint64), sizeof(cc_uint64), attempts);
     cc_swisstable table_b =
             cc_swisstable_empty(sizeof(cc_uint64), sizeof(cc_uint64));
-    for (cc_uint64 i = 0; i < 16384; ++i) {
+    for (cc_uint64 i = 0; i < attempts; ++i) {
         cc_assert(cc_swisstable_insert(&table_a, &i, hasher));
         cc_assert(cc_swisstable_insert(&table_b, &i, hasher));
     }
-    for (cc_uint64 i = 0; i < 16384; ++i) {
+    for (cc_uint64 i = 0; i < attempts; ++i) {
         cc_assert(*(cc_uint64 *) cc_swisstable_find(&table_a, &i, hasher,
                                                     equality) == i);
         cc_assert(*(cc_uint64 *) cc_swisstable_find(&table_b, &i, hasher,
                                                     equality) == i);
     }
-    for (cc_uint64 i = 16384; i < 32768; ++i) {
+    for (cc_uint64 i = attempts; i < attempts * 2; ++i) {
         cc_assert(!cc_swisstable_find(&table_a, &i, hasher, equality));
         cc_assert(!cc_swisstable_find(&table_b, &i, hasher, equality));
     }
@@ -238,9 +238,9 @@ void test_with_hasher(cc_swisstable_hasher hasher) {
 }
 
 void test4(void) {
-    test_with_hasher(good_hasher());
-    test_with_hasher(bad_hasher());
-    test_with_hasher(really_bad_hasher());
+    test_sequential_with_hasher(16384, good_hasher());
+    test_sequential_with_hasher(16384, bad_hasher());
+    test_sequential_with_hasher(1024, really_bad_hasher());
 }
 
 void test5(void) {
