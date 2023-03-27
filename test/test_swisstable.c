@@ -169,7 +169,7 @@ typedef enum {
 
 random_state default_random_state() {
     random_state state;
-    state.data = 0x20E6F213CD45A379ULL;
+    state.data = ((cc_uint64)default_random_state) ^ 0x20E6F213CD45A379ULL;
     return state;
 }
 
@@ -349,16 +349,44 @@ void test6(void) {
     rehash_test(really_bad_hasher());
 }
 
+void iterator_test(cc_size size, cc_swisstable_hasher hasher) {
+    cc_swisstable table = cc_swisstable_empty(sizeof(cc_uint64), sizeof(cc_uint64));
+    brutal_force_set set = bfs_create();
+    random_state state = default_random_state();
+    for (cc_size i = 0; i < size; ++i) {
+        cc_uint64 x = xorshift64(&state);
+        if (!cc_swisstable_find(&table, &x, hasher, equality)) {
+            cc_swisstable_insert(&table, &x, hasher);
+            bfs_insert(&set, x);
+        }
+    }
+    cc_size i = 0;
+    cc_swisstable_iter iter = cc_swisstable_create_iter(&table);
+    void * ptr = cc_swisstable_iter_next(&iter);
+    while (ptr) {
+        i += 1;
+        cc_assert(bfs_find(&set, *(cc_uint64 *) ptr));
+        ptr = cc_swisstable_iter_next(&iter);
+    }
+    cc_assert(i == set.size);
+    bfs_destroy(&set);
+    cc_swisstable_destroy(&table);
+}
+
+void test7(void) {
+    iterator_test(16384, good_hasher());
+    iterator_test(16384, bad_hasher());
+    iterator_test(4096, really_bad_hasher());
+}
+
 
 BEGIN_TEST
 
-AUTO_TEST_ITEM(
-
-1)
+AUTO_TEST_ITEM(1)
 AUTO_TEST_ITEM(2)
 AUTO_TEST_ITEM(3)
 AUTO_TEST_ITEM(4)
 AUTO_TEST_ITEM(5)
 AUTO_TEST_ITEM(6)
-
+AUTO_TEST_ITEM(7)
 END_TEST

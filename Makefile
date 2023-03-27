@@ -77,12 +77,13 @@ test_hash: test_hash.bin
 
 .PHONY: test_swisstable
 test_swisstable: test_swisstable.bin
-	$(call RUN_TEST_ITEM,test_swisstable,1,6)
-	$(call RUN_TEST_ITEM,test_swisstable,2,6)
-	$(call RUN_TEST_ITEM,test_swisstable,3,6)
-	$(call RUN_TEST_ITEM,test_swisstable,4,6)
-	$(call RUN_TEST_ITEM,test_swisstable,5,6)
-	$(call RUN_TEST_ITEM,test_swisstable,6,6)
+	$(call RUN_TEST_ITEM,test_swisstable,1,7)
+	$(call RUN_TEST_ITEM,test_swisstable,2,7)
+	$(call RUN_TEST_ITEM,test_swisstable,3,7)
+	$(call RUN_TEST_ITEM,test_swisstable,4,7)
+	$(call RUN_TEST_ITEM,test_swisstable,5,7)
+	$(call RUN_TEST_ITEM,test_swisstable,6,7)
+	$(call RUN_TEST_ITEM,test_swisstable,7,7)
 
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))
