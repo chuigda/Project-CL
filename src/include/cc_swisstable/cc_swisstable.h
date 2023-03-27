@@ -49,4 +49,10 @@ void cc_swisstable_erase(cc_swisstable *table, void *element);
 
 void cc_swisstable_destroy(cc_swisstable *table);
 
+cc_swisstable_iter cc_swisstable_create_iter(cc_swisstable *table);
+
+void * cc_swisstable_iter_next(cc_swisstable_iter *iter);
+
+cc_size cc_swisstable_iter_remaining(cc_swisstable_iter *iter);
+
 #endif // PROJECT_CL_SWISSTABLE_H

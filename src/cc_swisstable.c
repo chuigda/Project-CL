@@ -68,5 +68,25 @@ void cc_swisstable_destroy(cc_swisstable *table) {
     cc_st_destroy(table);
 }
 
+cc_swisstable_iter cc_swisstable_create_iter(cc_swisstable *table) {
+    return cc_st_iter_create(
+            (cc_st_ctrl *) table->ctrl,
+            cc_st_bucket_at(table, 0),
+            table->items,
+            table->element_size);
+}
+
+void *cc_swisstable_iter_next(cc_swisstable_iter *iter) {
+    cc_st_bucket bucket = cc_st_iter_next_checked(iter);
+    if (CC_UNLIKELY(!cc_st_bucket_is_valid(&bucket))) {
+        return NULL;
+    }
+    return cc_st_bucket_get(&bucket);
+}
+
+cc_size cc_swisstable_iter_remaining(cc_swisstable_iter *iter) {
+    return iter->elems;
+}
+
 
 

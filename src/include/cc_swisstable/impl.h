@@ -224,6 +224,7 @@ cc_st_create_with_uninitialized(cc_size element_size, cc_size element_alignment,
                                                 buckets, &offset, &size))) {
         return cc_st_create_invalid(element_size, element_alignment);
     }
+    size += (-size) & (alignment - 1);
     cc_st_ctrl *address = (cc_st_ctrl *) cc_alloc2(size, alignment);
     if (CC_UNLIKELY(address == NULL)) {
         return cc_st_create_invalid(element_size, element_alignment);
@@ -251,7 +252,7 @@ cc_st_create_with_capacity(cc_size element_size, cc_size element_alignment,
     cc_swisstable table = cc_st_create_with_uninitialized(
             element_size, element_alignment, num_of_buckets);
     if (cc_st_is_valid(&table)) {
-        cc_memset(table.ctrl, 0, num_of_buckets);
+        cc_memset(table.ctrl, CC_ST_EMPTY, num_of_buckets + sizeof (cc_st_group));
     }
     return table;
 }
@@ -399,7 +400,7 @@ static inline cc_st_bucket cc_st_find_with_hash(const cc_swisstable *table,
         }
 
         if (CC_LIKELY(cc_st_bitmask_any(cc_st_group_mask_empty(group)))) {
-            cc_st_bucket_create(NULL, 0, table->element_size);
+            return cc_st_bucket_create(NULL, 0, table->element_size);
         }
 
         cc_st_probe_seq_move_next(&seq, table->bucket_mask);
@@ -639,7 +640,7 @@ CC_ATTRIBUTE_ALWAYS_INLINE
 static inline cc_st_bucket cc_st_insert_at(cc_swisstable *table, cc_size index,
                                            cc_st_hash hash, const void *element,
                                            cc_swisstable_hasher hasher) {
-    cc_size prev_ctrl = ((cc_st_ctrl *) (table->ctrl))[index];
+    cc_st_ctrl prev_ctrl = ((cc_st_ctrl *) (table->ctrl))[index];
 
     // If we reach full load factor:
     //
@@ -689,6 +690,40 @@ cc_swisstable_iter cc_st_iter_create(
     iter.next = ctrl + sizeof(cc_st_group);
     *(cc_st_bitmask_iter *) (&iter.opaque) = bit_iter;
     return iter;
+}
+
+CC_ATTRIBUTE_ALWAYS_INLINE
+static inline
+cc_st_bucket cc_st_iter_next_unchecked(
+        cc_swisstable_iter *iter
+) {
+    while (1) {
+        cc_st_bitmask_iter *bit_iter = (cc_st_bitmask_iter *) &iter->opaque;
+        if (cc_st_bitmask_any(bit_iter->mask)) {
+            cc_size index = cc_st_bitmask_lowest_nz(bit_iter->mask);
+            cc_st_bitmask_iter_rm_lowest(bit_iter);
+            return cc_st_bucket_create(
+                    (cc_st_ctrl *) iter->bucket_ptr,
+                    index,
+                    iter->element_size);
+        }
+        bit_iter->mask =
+                cc_st_group_mask_full(cc_st_load_group(iter->next)) & cc_st_word_mask();
+        iter->next += sizeof(cc_st_group);
+        iter->bucket_ptr = cc_st_bucket_create(
+                (cc_st_ctrl *) iter->bucket_ptr, sizeof(cc_st_group), iter->element_size).ptr;
+    }
+}
+
+CC_ATTRIBUTE_ALWAYS_INLINE
+static inline
+cc_st_bucket cc_st_iter_next_checked(
+        cc_swisstable_iter *iter
+) {
+    if (CC_UNLIKELY(iter->elems == 0))
+        return cc_st_bucket_create(NULL, 0, iter->element_size);
+    iter->elems--;
+    return cc_st_iter_next_unchecked(iter);
 }
 
 #endif // PROJECT_CL_SWISSTABLE_IMPL_H
