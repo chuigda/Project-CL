@@ -23,7 +23,7 @@ static inline cc_size cc_st_repeat(cc_size byte) {
   return byte;
 }
 
-#define CC_ST_WORD_MASK (cc_st_repeat(0x80))
+#define CC_ST_WORD_MASK (cc_st_repeat(0x80U))
 #define CC_ST_WORD_STRIDE 8U
 
 #include "cc_swisstable/bitmask.inc"
@@ -153,9 +153,9 @@ cc_st_group_convert_special_to_empty_and_full_to_deleted(cc_st_group group) {
   // add `1` in that bit. The carry will not propogate outside
   // that byte:
   //      ~full = [ 01111111 | 11111111 | 11111111 | ... ]
-  //  full >> 1 = [ 00000001 | 00000000 | 00000000 | ... ]
+  //  full >> 7 = [ 00000001 | 00000000 | 00000000 | ... ]
   //     result = [ 10000000 | 11111111 | 11111111 | ... ]
-  return ~full + (full >> 1);
+  return ~full + (full >> 7);
 }
 
 #endif // PROJECT_CL_SWISSTABLE_ASIMD_H
