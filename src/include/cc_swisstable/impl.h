@@ -303,12 +303,6 @@ static inline cc_st_bucket cc_st_bucket_at(const cc_swisstable *table,
 }
 
 CC_ATTRIBUTE_ALWAYS_INLINE
-static inline cc_size cc_st_bucket_index(const cc_swisstable *table,
-                                         cc_st_bucket const *bucket) {
-    return (bucket->ptr - ((cc_st_ctrl *) (table->ctrl))) / table->element_size;
-}
-
-CC_ATTRIBUTE_ALWAYS_INLINE
 static inline void cc_st_set_ctrl(cc_swisstable *table, cc_size index,
                                   cc_st_ctrl value) {
     // Replicate the first sizeof(Group) control bytes at the end of

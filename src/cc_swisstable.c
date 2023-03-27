@@ -43,10 +43,7 @@ void *cc_swisstable_find(
 }
 
 void cc_swisstable_erase(cc_swisstable *table, void *element) {
-    cc_st_bucket bucket;
-    bucket.ptr = ((cc_st_ctrl *) element) + table->element_size;
-    bucket.element_size = table->element_size;
-    cc_size index = cc_st_bucket_index(table, element);
+    cc_size index = (((cc_st_ctrl *) table->ctrl) - ((cc_st_ctrl *) element)) / table->element_size - 1;
     cc_size index_before = (index - sizeof(cc_st_group)) & table->bucket_mask;
     cc_st_bitmask empty_before =
             cc_st_group_mask_empty(cc_st_load_group(&((cc_st_ctrl *) table->ctrl)[index_before]));
@@ -82,10 +79,6 @@ void *cc_swisstable_iter_next(cc_swisstable_iter *iter) {
         return NULL;
     }
     return cc_st_bucket_get(&bucket);
-}
-
-cc_size cc_swisstable_iter_remaining(cc_swisstable_iter *iter) {
-    return iter->elems;
 }
 
 

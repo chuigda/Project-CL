@@ -168,7 +168,7 @@ typedef enum {
 
 random_state default_random_state() {
     random_state state;
-    state.data = ((cc_uint64) default_random_state) ^ 0x20E6F213CD45A379ULL;
+    state.data = 0x20E6F213CD45A379ULL;
     return state;
 }
 
@@ -243,18 +243,117 @@ void test4(void) {
     test_sequential_with_hasher(1024, really_bad_hasher());
 }
 
-void test5(void) {
 
+void random_walk(cc_size attempts, cc_swisstable_hasher hasher) {
+    brutal_force_set set = bfs_create();
+    cc_swisstable table = cc_swisstable_empty(sizeof(cc_uint64), sizeof(cc_uint64));
+    random_state state = default_random_state();
+    for (cc_size i = 0; i < attempts; ++i) {
+        switch (next_test_action(&state)) {
+            case TEST_ACTION_INSERT: {
+                cc_uint64 x = xorshift64(&state);
+                bfs_insert(&set, x);
+                if (!cc_swisstable_find(&table, &x, hasher, equality)) {
+                    void *result = cc_swisstable_insert(&table, &x, hasher);
+                    cc_assert(*(cc_uint64 *) result == x);
+                }
+                cc_assert(*(cc_uint64 *) cc_swisstable_find(&table, &x, hasher, equality) == x);
+                break;
+            }
+            case TEST_ACTION_FIND: {
+                if (!set.size)
+                    continue;
+                cc_uint64 x = xorshift64(&state);
+                cc_assert(
+                        ((_Bool) cc_swisstable_find(&table, &x, hasher, equality)) == bfs_find(&set, x));
+                cc_size index = x % set.size;
+                cc_assert(*(cc_uint64 *) cc_swisstable_find(&table, &set.data[index], hasher, equality) ==
+                          set.data[index]);
+                break;
+            }
+            case TEST_ACTION_DELETE: {
+                if (!set.size)
+                    continue;
+                cc_uint64 x = xorshift64(&state);
+                cc_size index = (cc_size) x % set.size;
+                cc_uint64 target = set.data[index];
+                bfs_erase(&set, target);
+                cc_assert(*(cc_uint64 *) cc_swisstable_find(&table, &target, hasher, equality) == target);
+                cc_swisstable_erase(&table, cc_swisstable_find(&table, &target, hasher, equality));
+                cc_assert(!cc_swisstable_find(&table, &target, hasher, equality));
+                break;
+            }
+            default:
+                continue;
+        }
+    }
+    for (cc_size i = 0; i < set.size; ++i) {
+        cc_assert(*(cc_uint64 *) cc_swisstable_find(&table, &set.data[i], hasher, equality) == set.data[i]);
+    }
+    for (cc_size i = 0; i < attempts; ++i) {
+        cc_uint64 x = xorshift64(&state);
+        cc_assert(
+                ((_Bool) cc_swisstable_find(&table, &x, hasher, equality)) == bfs_find(&set, x));
+    }
+    cc_swisstable_destroy(&table);
+    bfs_destroy(&set);
+}
+
+void rehash_test(cc_swisstable_hasher hasher) {
+    cc_swisstable table = cc_swisstable_with_capacity(
+            sizeof(cc_uint64), sizeof(cc_uint64), 512);
+    cc_uint64 i = 0;
+    for (; i < 512; ++i) {
+        if (table.growth_left != 0) {
+            cc_swisstable_insert(&table, &i, hasher);
+        } else {
+            break;
+        }
+    }
+
+    cc_uint64 n = i;
+
+    for (i = 0; i < 128; ++i) {
+        cc_swisstable_erase(&table, cc_swisstable_find(&table, &i, hasher, equality));
+    }
+
+    for (i = 1000; i < 1128; ++i) {
+        cc_swisstable_insert(&table, &i, hasher);
+    }
+
+    for (i = 0; i < 128; ++i) {
+        cc_assert(!cc_swisstable_find(&table, &i, hasher, equality));
+    }
+
+    for (i = n; i < 512; ++i) {
+        cc_assert(*(cc_uint64 *) cc_swisstable_find(&table, &i, hasher, equality) == i);
+    }
+
+    for (i = 1000; i < 1128; ++i) {
+        cc_assert(*(cc_uint64 *) cc_swisstable_find(&table, &i, hasher, equality) == i);
+    }
+
+    cc_swisstable_destroy(&table);
+}
+
+void test5(void) {
+    random_walk(32768, good_hasher());
+    random_walk(32768, bad_hasher());
+    random_walk(4096, really_bad_hasher());
 }
 
 void test6(void) {
-
+    rehash_test(good_hasher());
+    rehash_test(bad_hasher());
+    rehash_test(really_bad_hasher());
 }
 
 
 BEGIN_TEST
 
-AUTO_TEST_ITEM(1)
+AUTO_TEST_ITEM(
+
+1)
 AUTO_TEST_ITEM(2)
 AUTO_TEST_ITEM(3)
 AUTO_TEST_ITEM(4)
