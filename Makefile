@@ -56,7 +56,7 @@ define RUN_TEST_ITEM
 endef
 
 .PHONY: test test-log
-test: test-log test_vec test_hash test_swisstable
+test: test-log test_vec test_hash test_swisstable test_hashmap
 
 test-log:
 	@echo Running tests
@@ -84,6 +84,11 @@ test_swisstable: test_swisstable.bin
 	$(call RUN_TEST_ITEM,test_swisstable,5,7)
 	$(call RUN_TEST_ITEM,test_swisstable,6,7)
 	$(call RUN_TEST_ITEM,test_swisstable,7,7)
+
+.PHONY: test_hashmap
+test_hashmap: test_hashmap.bin
+	$(call RUN_TEST_ITEM,test_hashmap,1,2)
+	$(call RUN_TEST_ITEM,test_hashmap,2,2)
 
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))

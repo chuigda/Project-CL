@@ -534,7 +534,7 @@ static inline _Bool cc_st_rehash_inplace(cc_swisstable *table,
 
         while (1) {
             cc_st_hash hash = (cc_st_hash) hasher.hash(
-                    hasher.state, cc_st_bucket_get(&bucket), table->element_size);
+                    hasher.state, cc_st_bucket_get(&bucket));
             size_t new_idx = cc_st_find_insert_slot(table, hash);
             // Probing works by scanning through all of the control
             // bytes in groups, which may not be aligned to the group
@@ -586,7 +586,7 @@ static inline _Bool cc_st_resize(cc_swisstable *table, cc_size new_capacity,
 
         cc_st_bucket bucket = cc_st_bucket_at(table, i);
         cc_st_hash hash = (cc_st_hash) hasher.hash(
-                hasher.state, cc_st_bucket_get(&bucket), table->element_size);
+                hasher.state, cc_st_bucket_get(&bucket));
 
         // We can use a simpler version of insert() here since:
         // - there are no DELETED entries.
@@ -697,6 +697,7 @@ cc_st_bucket cc_st_iter_next_unchecked(
         if (cc_st_bitmask_any(bit_iter.mask)) {
             cc_size index = cc_st_bitmask_lowest_nz(bit_iter.mask);
             cc_st_bitmask_iter_rm_lowest(&bit_iter);
+            iter->opaque = (cc_uint64) bit_iter.mask;
             return cc_st_bucket_create(
                     (cc_st_ctrl *) iter->bucket_ptr,
                     index,

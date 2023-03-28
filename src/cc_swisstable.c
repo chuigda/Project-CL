@@ -7,7 +7,7 @@ void *cc_swisstable_insert(
         const void *element,
         cc_swisstable_hasher hasher
 ) {
-    cc_st_hash hash = hasher.hash(hasher.state, element, table->element_size);
+    cc_st_hash hash = hasher.hash(hasher.state, element);
     cc_size index = cc_st_find_insert_slot(table, hash);
     cc_st_bucket bucket = cc_st_insert_at(table, index, hash, element, hasher);
     if (CC_UNLIKELY(!cc_st_bucket_is_valid(&bucket))) {
@@ -29,12 +29,12 @@ cc_swisstable cc_swisstable_with_capacity(
 }
 
 void *cc_swisstable_find(
-        cc_swisstable *table,
+        const cc_swisstable *table,
         void *element,
         cc_swisstable_hasher hasher,
         cc_pred2 equal
 ) {
-    cc_st_hash hash = hasher.hash(hasher.state, element, table->element_size);
+    cc_st_hash hash = hasher.hash(hasher.state, element);
     cc_st_bucket bucket = cc_st_find_with_hash(table, hash, element, equal);
     if (CC_UNLIKELY(!cc_st_bucket_is_valid(&bucket))) {
         return NULL;
@@ -79,6 +79,11 @@ void *cc_swisstable_iter_next(cc_swisstable_iter *iter) {
         return NULL;
     }
     return cc_st_bucket_get(&bucket);
+}
+
+_Bool cc_swisstable_reserve(
+        cc_swisstable *table, cc_size additional, cc_swisstable_hasher hasher) {
+    return cc_st_reserve_rehash(table, additional, hasher);
 }
 
 

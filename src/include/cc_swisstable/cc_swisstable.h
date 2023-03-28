@@ -10,7 +10,7 @@
 typedef struct {
     void *state;
 
-    cc_uint64 (*hash)(void *state, const void *key, cc_size key_size);
+    cc_uint64 (*hash)(void *state, const void *key);
 } cc_swisstable_hasher;
 
 // for internal usage thus expose details
@@ -42,7 +42,7 @@ cc_swisstable cc_swisstable_with_capacity(cc_size element_size,
                                           cc_size element_alignment,
                                           cc_size capacity);
 
-void *cc_swisstable_find(cc_swisstable *table, void *element,
+void *cc_swisstable_find(const cc_swisstable *table, void *element,
                          cc_swisstable_hasher hasher, cc_pred2 equal);
 
 void cc_swisstable_erase(cc_swisstable *table, void *element);
@@ -52,5 +52,10 @@ void cc_swisstable_destroy(cc_swisstable *table);
 cc_swisstable_iter cc_swisstable_create_iter(cc_swisstable *table);
 
 void * cc_swisstable_iter_next(cc_swisstable_iter *iter);
+
+_Bool cc_swisstable_reserve(
+        cc_swisstable * table,
+        cc_size additional,
+        cc_swisstable_hasher hasher);
 
 #endif // PROJECT_CL_SWISSTABLE_H

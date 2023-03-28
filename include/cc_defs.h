@@ -188,4 +188,9 @@ _Bool cc_opaque_predicate(_Bool x) {
 #   endif
 #endif
 
+typedef struct {
+    cc_size size;
+    cc_size alignment;
+} cc_data_layout;
+
 #endif /* PROJECT_CL_DEFS_H */

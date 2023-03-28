@@ -178,22 +178,20 @@ test_action next_test_action(random_state *state) {
     return (test_action) (x % TEST_ACTION_MAX);
 }
 
-cc_uint64 good_hash_function(void *state, const void *key, cc_size key_size) {
-    return cc_unstable_hash(key, key_size, (cc_uint64) state);
+cc_uint64 good_hash_function(void *state, const void *key) {
+    return cc_unstable_hash(key, sizeof(cc_uint64), (cc_uint64) state);
 }
 
-cc_uint64 bad_hash_function(void *state, const void *key, cc_size key_size) {
+cc_uint64 bad_hash_function(void *state, const void *key) {
     (void) state;
     cc_uint64 x;
-    cc_memcpy(&x, key, key_size < sizeof(x) ? key_size : sizeof(x));
+    cc_memcpy(&x, key, sizeof(x));
     return x;
 }
 
-cc_uint64 really_bad_hash_function(void *state, const void *key,
-                                   cc_size key_size) {
+cc_uint64 really_bad_hash_function(void *state, const void *key) {
     (void) state;
     (void) key;
-    (void) key_size;
     return 0;
 }
 
