@@ -72,8 +72,6 @@ cc_hashmap_with_capacity(
         cc_size capacity) {
     cc_size alignment = cc_hashmap_alignment();
     cc_size size = cc_hashmap_element_size();
-    size += (-size) & (value_layout.alignment - 1);
-    size += value_layout.size;
     cc_hashmap *hashmap = (cc_hashmap *) cc_alloc(sizeof(cc_hashmap));
     if (!hashmap) {
         return NULL;
@@ -135,7 +133,7 @@ void *cc_hashmap_insert_unchecked(cc_hashmap *map, void *key, void *value) {
     cc_memcpy(cc_hashmap_get_value(kv_buffer), value, value_layout.size);
     void *ptr = cc_swisstable_insert(&map->table, kv_buffer, hasher);
     if (kv_buffer_is_on_heap) {
-        cc_free(ptr);
+        cc_free(kv_buffer);
     }
     return ptr;
 }
