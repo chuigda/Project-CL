@@ -372,9 +372,9 @@ void iterator_test(cc_size size, cc_swisstable_hasher hasher) {
 }
 
 void test7(void) {
-    iterator_test(16384, good_hasher());
-    iterator_test(16384, bad_hasher());
-    iterator_test(4096, really_bad_hasher());
+    iterator_test(32768, good_hasher());
+    iterator_test(32768, bad_hasher());
+    iterator_test(1024, really_bad_hasher());
 }
 
 
