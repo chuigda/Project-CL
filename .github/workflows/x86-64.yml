@@ -11,6 +11,8 @@ jobs:
     strategy:
       matrix:
         include:
+          - EXTRA_CFLAGS: -m32
+          - EXTRA_CFLAGS: -m32 -mno-sse2
           - EXTRA_CFLAGS: -march=native
           - EXTRA_CFLAGS: -march=native -DNDEBUG
           - EXTRA_CFLAGS: -march=native -fsanitize=address

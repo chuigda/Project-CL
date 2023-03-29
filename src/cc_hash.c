@@ -222,10 +222,8 @@ typedef struct {
   cc_uint64 extra_keys[2];
 } cc_stable_hasher;
 
-static const
-cc_size PROJECT_CL_STABLE_HASH_ROTATE = 23;
-static const
-cc_size PROJECT_CL_STABLE_HASH_MULTIPLE = 6364136223846793005;
+#define PROJECT_CL_STABLE_HASH_ROTATE 23
+#define PROJECT_CL_STABLE_HASH_MULTIPLE 6364136223846793005
 
 static inline void cc_hash_stable_digest128(cc_stable_hasher *hasher,
                                             cc_hash_uint128 data) {
