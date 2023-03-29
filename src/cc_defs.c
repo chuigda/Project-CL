@@ -16,11 +16,11 @@
 #   ifdef PROJECT_CL_BUILD_LIST
 #       error SANITY CHECK: cannot enable LIST without ALLOC
 #   endif
-#   ifdef PROJECT_CL_BUILD_SET
-#       error SANITY CHECK: cannot enable SET without ALLOC
+#   ifdef PROJECT_CL_BUILD_HASHSET
+#       error SANITY CHECK: cannot enable HASHSET without ALLOC
 #   endif
-#   ifdef PROJECT_CL_BUILD_MAP
-#       error SANITY CHECK: cannot enable MAP without ALLOC
+#   ifdef PROJECT_CL_BUILD_HASHMAP
+#       error SANITY CHECK: cannot enable HASHMAP without ALLOC
 #   endif
 #   ifdef PROJECT_CL_BUILD_STRING
 #       error SANITY CHECK: cannot enable STRING without ALLOC
