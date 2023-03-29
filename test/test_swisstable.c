@@ -71,7 +71,7 @@ void bfs_insert(brutal_force_set *set, cc_uint64 target) {
 }
 
 _Bool bfs_find(brutal_force_set *set, cc_uint64 target) {
-  return target == *bfs_binary_search(set, target);
+  return set->size && target == *bfs_binary_search(set, target);
 }
 
 void bfs_erase(brutal_force_set *set, cc_uint64 target) {
