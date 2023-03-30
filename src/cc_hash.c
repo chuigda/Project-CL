@@ -113,8 +113,8 @@ static inline cc_uint16 cc_hash_swap_bytes16(cc_uint16 x) {
 static inline cc_hash_uint128 cc_hash_load_uint128le(const void *data) {
   cc_hash_uint128 value;
   const cc_uint64 *src = (const cc_uint64 *)data;
-  PROJECT_CL_HASH_GENERIC_LOAD(&value.data[0], &src[0]);
-  PROJECT_CL_HASH_GENERIC_LOAD(&value.data[1], &src[1]);
+  PROJECT_CL_HASH_GENERIC_LOAD(&value.data[0], (const uint8_t *)&src[0]);
+  PROJECT_CL_HASH_GENERIC_LOAD(&value.data[1], (const uint8_t *)&src[1]);
   if (PROJECT_CL_IS_BIG_ENDIAN()) {
     cc_uint64 low = cc_hash_swap_bytes64(value.data[0]);
     cc_uint64 high = cc_hash_swap_bytes64(value.data[1]);
