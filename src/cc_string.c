@@ -4,6 +4,7 @@
 
 #include <string.h>
 
+#include <cc_assert.h>
 #include <cc_string.h>
 #include <cc_vec.h>
 #include <cc_alloc.h>
@@ -49,7 +50,7 @@ void cc_string_destroy(cc_string *s) {
     cc_free(s);
 }
 
-inline cc_error cc_string_resize(cc_string* s, cc_size inc) {
+static inline cc_error cc_string_resize(cc_string* s, cc_size inc) {
     cc_size tgtlen = s->len + inc;
     if (tgtlen < s->cap) {
         return CC_NO_ERROR;
@@ -57,7 +58,7 @@ inline cc_error cc_string_resize(cc_string* s, cc_size inc) {
     // else set cap = 2 * target_len
     cc_size tgtcap = tgtlen << 1;
     // we don't deal with overflows
-    char* tmpbuf = (char*)realloc(s->buf, tgtcap * sizeof(char));
+    char* tmpbuf = (char*)cc_realloc(s->buf, tgtcap * sizeof(char));
     if (!tmpbuf) {
         return CC_OUT_OF_MEMORY;
     }
@@ -77,25 +78,25 @@ cc_error cc_string_push_char(cc_string *s, cc_char c) {
     return CC_NO_ERROR;
 }
 
-cc_error cc_string_appendn(cc_string *s, cc_char *s2, cc_size n) {
+cc_error cc_string_appendn(cc_string *s, const cc_char *s2, cc_size n) {
     RT_CONTRACT_E(s && s2);
     cc_error err;
     if ((err = cc_string_resize(s, n)) != CC_NO_ERROR) {
         return err;
     }
-    cc_memcpy(s->buf + s->len, s2, n * sizeof(cc_char));
+    cc_memcpy(s->buf + s->len, (void *)s2, n * sizeof(cc_char));
     s->len += n;
     return CC_NO_ERROR;
 }
 
-cc_error cc_string_appends(cc_string *s, cc_char *s2) {
+cc_error cc_string_appends(cc_string *s, const cc_char *s2) {
     RT_CONTRACT_E(s && s2);
     cc_size s2len = strlen(s2);
     return cc_string_appendn(s, s2, s2len);
 }
 
 cc_char cc_string_at(cc_string *s, cc_size idx) {
-    RT_CONTRACT_E(s && s->len > idx);
+    RT_CONTRACT2(s && s->len > idx, 0);
     return s->buf[idx];
 }
 
@@ -126,7 +127,7 @@ cc_char *cc_string_own_cstr(cc_string *s, cc_size *o_len, cc_size *o_cap) {
     return buf;
 }
 
-cc_string_iter *cc_string_rune_iterator(cc_string *s) {
+cc_string_iter *cc_string_iterator(cc_string *s) {
     cc_string_iter *it = cc_alloc(sizeof(cc_string_iter));
     if (!it) {
         return NULL;
@@ -136,21 +137,21 @@ cc_string_iter *cc_string_rune_iterator(cc_string *s) {
     return it;
 }
 
-void cc_string_runeiter_destroy(cc_string_iter *it) {
+void cc_string_iter_destroy(cc_string_iter *it) {
     if (!it) {
         return;
     }
     cc_free(it);
 }
 
-cc_bool cc_string_runeiter_has_next(cc_string_iter *it) {
+cc_bool cc_string_iter_has_next(cc_string_iter *it) {
     RT_CONTRACT_E(it);
     return it->idx < it->s->len;
 }
 
-cc_error cc_string_runeiter_next(cc_string_iter *it, cc_rune *o_res) {
+cc_error cc_string_iter_next(cc_string_iter *it, cc_rune *o_res) {
     RT_CONTRACT_E(it);
-    if (!cc_string_runeiter_has_next(it)) {
+    if (!cc_string_iter_has_next(it)) {
         return CC_END_OF_ITERATOR;
     }
     it->buf[0] = it->s->buf[it->idx];
@@ -159,25 +160,25 @@ cc_error cc_string_runeiter_next(cc_string_iter *it, cc_rune *o_res) {
         *o_res = (cc_rune)it->buf[0];
         return CC_NO_ERROR;
     }
-    if (!cc_string_runeiter_has_next(it)) {
+    if (!cc_string_iter_has_next(it)) {
         return CC_BAD_UTF8_BYTE;
     }
     it->buf[1] = it->s->buf[it->idx];
     it->idx++;
-    if (it->buf[0] >> 5 == 0b110) {
-        if (it->buf[1] >> 6 != 0b10) {
+    if (it->buf[0] >> 5 == 0x6) {
+        if (it->buf[1] >> 6 != 0x2) {
             return CC_BAD_UTF8_BYTE;
         }
         *o_res = ((it->buf[0] & 0x1F) << 6) | (it->buf[1] & 0x3F);
         return CC_NO_ERROR;
     }
-    if (!cc_string_runeiter_has_next(it)) {
+    if (!cc_string_iter_has_next(it)) {
         return CC_BAD_UTF8_BYTE;
     }
     it->buf[2] = it->s->buf[it->idx];
     it->idx++;
-    if (it->buf[0] >> 4 == 0b1110) {
-        if (it->buf[1] >> 6 != 0b10 || it->buf[2] >> 6 != 0b10) {
+    if (it->buf[0] >> 4 == 0xE) {
+        if (it->buf[1] >> 6 != 0x2 || it->buf[2] >> 6 != 0x2) {
             return CC_BAD_UTF8_BYTE;
         }
         *o_res = ((it->buf[0] & 0xF) << 12)
@@ -185,14 +186,14 @@ cc_error cc_string_runeiter_next(cc_string_iter *it, cc_rune *o_res) {
                 | (it->buf[2] & 0x3F);
         return CC_NO_ERROR;
     }
-    if (!cc_string_runeiter_has_next(it)) {
+    if (!cc_string_iter_has_next(it)) {
         return CC_BAD_UTF8_BYTE;
     }
     it->buf[3] = it->s->buf[it->idx];
     it->idx++;
-    if (it->buf[0] >> 3 == 0b11110) {
-        if (it->buf[1] >> 6 != 0b10 || it->buf[2] >> 6 != 0b10
-            || it->buf[3] >> 6 != 0b10) {
+    if (it->buf[0] >> 3 == 0x1E) {
+        if (it->buf[1] >> 6 != 0x2 || it->buf[2] >> 6 != 0x2
+            || it->buf[3] >> 6 != 0x2) {
             return CC_BAD_UTF8_BYTE;
         }
         *o_res = ((it->buf[0] & 0x7) << 18)

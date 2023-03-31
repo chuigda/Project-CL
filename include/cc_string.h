@@ -8,6 +8,7 @@
 #endif
 
 #include <cc_defs.h>
+#include <cc_error.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,9 +28,11 @@ void cc_string_destroy(cc_string *s);
 
 cc_error cc_string_push_char(cc_string *s, cc_char c);
 
-cc_error cc_string_appendn(cc_string *s, cc_char *s2, cc_size n);
+cc_error cc_string_appendn(cc_string *s, const cc_char *s2, cc_size n);
 
-cc_error cc_string_appends(cc_string *s, cc_char *s2);
+cc_error cc_string_appends(cc_string *s, const cc_char *s2);
+
+#define cc_string_append_strlit(s, s2) cc_string_appendn((s), (s2), sizeof((s2)) - 1)
 
 cc_char cc_string_at(cc_string *s, cc_size idx);
 
@@ -41,13 +44,13 @@ cc_char *cc_string_cstr(cc_string *s);
 
 cc_char *cc_string_own_cstr(cc_string *s, cc_size *o_len, cc_size *o_cap);
 
-cc_string_iter *cc_string_rune_iterator(cc_string *s);
+cc_string_iter *cc_string_iterator(cc_string *s);
 
-void cc_string_runeiter_destroy(cc_string_iter *it);
+void cc_string_iter_destroy(cc_string_iter *it);
 
-cc_bool cc_string_runeiter_has_next(cc_string_iter *it);
+cc_bool cc_string_iter_has_next(cc_string_iter *it);
 
-cc_error cc_string_runeiter_next(cc_string_iter *it, cc_rune *o_res);
+cc_error cc_string_iter_next(cc_string_iter *it, cc_rune *o_res);
 
 #ifdef __cplusplus
 } /* extern "C" */
