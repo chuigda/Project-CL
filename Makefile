@@ -52,6 +52,7 @@ endef
 define RUN_TEST_ITEM
 	@printf '\tTEST\t%s\t\t\tCASE %s/%s\t' $1 $2 $3
 	ldd ./$1.bin
+	file ./$1.bin
 	@./$1.bin $2 1> /dev/null
 	@printf 'PASS\n'
 endef
