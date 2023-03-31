@@ -6,7 +6,8 @@
 #elif defined(__ARM_NEON)
 
 #   include "cc_swisstable/asimd.h"
-
+#elif defined(__wasm_simd128__)
+#   include "cc_swisstable/wasm_fixed_simd.h"
 #else
 #   include "cc_swisstable/generic.h"
 #endif
