@@ -46,13 +46,12 @@ define BUILD_TEST_ITEM
 	$(call LOG,BUILD,$1)
 	@$(CC) $(CFLAGS) $2 \
 		-Iconfig -Iinclude -Isrc/include -Itest/kit \
-		-L. -lcl2 -lm -o $1
+		-L. -Wl,-rpath,. -lcl2 -lm -o $1
 endef
 
 define RUN_TEST_ITEM
 	@printf '\tTEST\t%s\t\t\tCASE %s/%s\t' $1 $2 $3
-	ldd ./$1.bin
-	@LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:. ./$1.bin $2 1> /dev/null
+	@./$1.bin $2 1> /dev/null
 	@printf 'PASS\n'
 endef
 
