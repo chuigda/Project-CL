@@ -21,7 +21,7 @@ void uint64_sum_check(void *a, void *b, void *sum) {
   cc_assert(*(cc_uint64 *)a + 1 == *(cc_uint64 *)b);
 }
 
-void test1() {
+void test1(void) {
   cc_hashmap *map =
       cc_hashmap_create((cc_data_layout){.size = sizeof(cc_uint64),
                                          .alignment = sizeof(cc_uint64)},
@@ -43,7 +43,7 @@ void test1() {
   cc_assert(sum == result);
 }
 
-void test2() {
+void test2(void) {
   cc_uint64 limit = 100000;
   cc_hashmap *map = cc_hashmap_with_capacity(
       (cc_data_layout){.size = sizeof(cc_uint64),

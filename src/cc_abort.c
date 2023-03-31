@@ -43,7 +43,7 @@ _Bool cc_dump_stacktrace(void) {
 }
 
 #else
-_Bool cc_dump_stacktrace() {
+_Bool cc_dump_stacktrace(void) {
     return 0;
 }
 #endif

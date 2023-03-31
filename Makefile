@@ -1,12 +1,19 @@
 ifndef CC
 	CC = gcc
 endif
+
 ifndef AR
 	AR = ar
 endif
+
+ifndef PREFER_STATIC
+	PREFER_STATIC = 0
+endif
+
 ifndef RANLIB
 	RANLIB = ranlib
 endif
+
 ifndef CFLAGS
 	CFLAGS = -Wall -Wextra -pedantic -O2 -g $(EXTRA_CFLAGS)
 endif
@@ -51,6 +58,13 @@ libcl2.a: cc_defs.o $(OBJECT_FILES)
 	$(call LOG,RANLIB,libcl2.a)
 	@$(RANLIB) $@
 
+TEST_FLAGS = -Wl,-rpath,.
+TEST_DEPENDENCY = $(SHARED_LIB_NAME)
+
+ifeq ($(PREFER_STATIC), 1)
+	TEST_FLAGS := -static
+	TEST_DEPENDENCY := libcl2.a
+endif
 
 %.o: src/%.c $(HEADER_FILES) src/include/cc_impl.h
 	$(call COMPILE,$<,$@)
@@ -59,12 +73,12 @@ define BUILD_TEST_ITEM
 	$(call LOG,BUILD,$1)
 	@$(CC) $(CFLAGS) $2 \
 		-Iconfig -Iinclude -Isrc/include -Itest/kit \
-		-L. -Wl,-rpath,. -lcl2 -lm -o $1
+		-L. $(TEST_FLAGS) -lcl2 -lm -o $1
 endef
 
 define RUN_TEST_ITEM
 	@printf '\tTEST\t%s\t\t\tCASE %s/%s\t' $1 $2 $3
-	@./$1.bin $2 1> /dev/null
+	@$(TEST_RUNNER) ./$1.bin $2 1> /dev/null
 	@printf 'PASS\n'
 endef
 
@@ -106,7 +120,7 @@ test_hashmap: test_hashmap.bin
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))
 
-%.bin: test/%.c $(SHARED_LIB_NAME) libcl2.a
+%.bin: test/%.c $(TEST_DEPENDENCY)
 	$(call BUILD_TEST_ITEM,$@,$<)
 
 .PHONY: clean
