@@ -112,9 +112,9 @@ static inline cc_uint16 cc_hash_swap_bytes16(cc_uint16 x) {
 // load and always make sure that low address is less significant
 static inline cc_hash_uint128 cc_hash_load_uint128le(const void *data) {
   cc_hash_uint128 value;
-  const cc_uint64 *src = (const cc_uint64 *)data;
-  PROJECT_CL_HASH_GENERIC_LOAD(&value.data[0], &src[0]);
-  PROJECT_CL_HASH_GENERIC_LOAD(&value.data[1], &src[1]);
+  const cc_uint8 *src = (const cc_uint8 *)data;
+  PROJECT_CL_HASH_GENERIC_LOAD(&value.data[0], src + 0 * sizeof (cc_uint64));
+  PROJECT_CL_HASH_GENERIC_LOAD(&value.data[1], src + 1 * sizeof (cc_uint64));
   if (PROJECT_CL_IS_BIG_ENDIAN()) {
     cc_uint64 low = cc_hash_swap_bytes64(value.data[0]);
     cc_uint64 high = cc_hash_swap_bytes64(value.data[1]);
@@ -225,7 +225,7 @@ typedef struct {
 static const
 cc_size PROJECT_CL_STABLE_HASH_ROTATE = 23;
 static const
-cc_size PROJECT_CL_STABLE_HASH_MULTIPLE = 6364136223846793005;
+cc_uint64 PROJECT_CL_STABLE_HASH_MULTIPLE = 6364136223846793005;
 
 static inline void cc_hash_stable_digest128(cc_stable_hasher *hasher,
                                             cc_hash_uint128 data) {
