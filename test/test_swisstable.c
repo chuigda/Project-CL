@@ -173,14 +173,14 @@ typedef enum {
 
 random_state default_random_state(void) {
   random_state state;
-  state.data = ((cc_uint64)(cc_size)default_random_state);
-  if (sizeof (cc_size) < sizeof(cc_uint64)) {
-    state.data |= state.data << 32;
-  }
-  state.data ^= 0x20E6F213CD45A379ULL;
-#if defined(__has_include) && __has_include(<stdio.h>)
-  fprintf(stderr, "random state: %llu\n", state.data);
-#endif
+//  state.data = ((cc_uint64)(cc_size)default_random_state);
+//  if (sizeof (cc_size) < sizeof(cc_uint64)) {
+//    state.data |= state.data << 32;
+//  }
+  state.data = 2370762699382508377;
+//#if defined(__has_include) && __has_include(<stdio.h>)
+//  fprintf(stderr, "random state: %llu\n", state.data);
+//#endif
   return state;
 }
 
