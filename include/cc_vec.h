@@ -61,8 +61,6 @@ cc_error cc_vec_remove_if(cc_vec *vec, cc_pred pred);
 
 cc_error cc_vec_remove_if2(cc_vec *vec, cc_pred2 pred, void *ctx);
 
-cc_error cc_vec_copy(cc_vec* vec, void *buf);
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

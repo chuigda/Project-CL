@@ -13,15 +13,13 @@
 extern "C" {
 #endif
 
-#define CC_STRING_BACK(s) ((s)->buf[(s)->len])
-
 struct st_cc_string;
 
-struct st_cc_string_runeiter;
+struct st_cc_string_iter;
 
 typedef struct st_cc_string cc_string;
 
-typedef struct st_cc_string_runeiter cc_string_runeiter;
+typedef struct st_cc_string_iter cc_string_iter;
 
 cc_string *cc_string_init();
 
@@ -43,13 +41,13 @@ cc_char *cc_string_cstr(cc_string *s);
 
 cc_char *cc_string_own_cstr(cc_string *s, cc_size *o_len, cc_size *o_cap);
 
-cc_string_runeiter *cc_string_rune_iterator(cc_string *s);
+cc_string_iter *cc_string_rune_iterator(cc_string *s);
 
-void cc_string_runeiter_destroy(cc_string_runeiter *it);
+void cc_string_runeiter_destroy(cc_string_iter *it);
 
-cc_bool cc_string_runeiter_has_next(cc_string_runeiter *it);
+cc_bool cc_string_runeiter_has_next(cc_string_iter *it);
 
-cc_error cc_string_runeiter_next(cc_string_runeiter *it, cc_rune *o_res);
+cc_error cc_string_runeiter_next(cc_string_iter *it, cc_rune *o_res);
 
 #ifdef __cplusplus
 } /* extern "C" */

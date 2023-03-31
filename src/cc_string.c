@@ -12,9 +12,7 @@
 
 #include <cc_impl.h>
 
-#ifndef CC_STRING_MAXSIZE
-#   define CC_STRING_MAXSIZE (SIZE_MAX - 100)
-#endif
+#define CC_STRING_BACK(s) ((s)->buf[(s)->len])
 
 struct st_cc_string {
     cc_char *buf;
@@ -22,7 +20,7 @@ struct st_cc_string {
     cc_size cap;
 };
 
-struct st_cc_string_runeiter {
+struct st_cc_string_iter {
     cc_uchar buf[8];
     cc_string *s;
     cc_size idx;
@@ -58,12 +56,7 @@ inline cc_error cc_string_resize(cc_string* s, cc_size inc) {
     }
     // else set cap = 2 * target_len
     cc_size tgtcap = tgtlen << 1;
-    if (tgtcap < s->cap) {  // if overflow
-        if (s->cap > CC_STRING_MAXSIZE) {
-            return CC_OUT_OF_MEMORY;
-        }
-        tgtcap = CC_STRING_MAXSIZE;
-    }
+    // we don't deal with overflows
     char* tmpbuf = (char*)realloc(s->buf, tgtcap * sizeof(char));
     if (!tmpbuf) {
         return CC_OUT_OF_MEMORY;
@@ -133,8 +126,8 @@ cc_char *cc_string_own_cstr(cc_string *s, cc_size *o_len, cc_size *o_cap) {
     return buf;
 }
 
-cc_string_runeiter *cc_string_rune_iterator(cc_string *s) {
-    cc_string_runeiter *it = cc_alloc(sizeof(cc_string_runeiter));
+cc_string_iter *cc_string_rune_iterator(cc_string *s) {
+    cc_string_iter *it = cc_alloc(sizeof(cc_string_iter));
     if (!it) {
         return NULL;
     }
@@ -143,19 +136,19 @@ cc_string_runeiter *cc_string_rune_iterator(cc_string *s) {
     return it;
 }
 
-void cc_string_runeiter_destroy(cc_string_runeiter *it) {
+void cc_string_runeiter_destroy(cc_string_iter *it) {
     if (!it) {
         return;
     }
     cc_free(it);
 }
 
-cc_bool cc_string_runeiter_has_next(cc_string_runeiter *it) {
+cc_bool cc_string_runeiter_has_next(cc_string_iter *it) {
     RT_CONTRACT_E(it);
     return it->idx < it->s->len;
 }
 
-cc_error cc_string_runeiter_next(cc_string_runeiter *it, cc_rune *o_res) {
+cc_error cc_string_runeiter_next(cc_string_iter *it, cc_rune *o_res) {
     RT_CONTRACT_E(it);
     if (!cc_string_runeiter_has_next(it)) {
         return CC_END_OF_ITERATOR;

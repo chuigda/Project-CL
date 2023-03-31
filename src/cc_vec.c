@@ -319,9 +319,4 @@ cc_vec_remove_if2(cc_vec *vec, cc_pred2 pred, void *ctx) {
     return CC_NO_ERROR;
 }
 
-cc_error cc_vec_copy(cc_vec* vec, void *buf) {
-    cc_memcpy(buf, vec, vec->size * vec->item_size);
-    return CC_NO_ERROR;
-}
-
 #endif /* PROJECT_CL_BUILD_VEC */
