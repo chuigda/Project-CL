@@ -29,7 +29,8 @@ jobs:
       - name: Generate Prime Numbers
         if: steps.cache-primes.outputs.cache-hit != 'true'
         run: |
-          mkdir -p /toolchain
+          sudo mkdir -p /toolchain
+          sudo chmod 777 /toolchain
           cd /toolchain
           wget https://musl.cc/${{ matrix.ARCH }}-linux-musl-cross.tgz
           tar xvf ${{ matrix.ARCH }}-linux-musl-cross.tgz
