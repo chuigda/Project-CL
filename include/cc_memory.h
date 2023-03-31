@@ -9,7 +9,7 @@ extern "C" {
 
 void cc_memset(void *ptr, cc_uint8 value, cc_size cnt);
 
-void cc_memcpy(void *dst, void *src, cc_size cnt);
+void cc_memcpy(void *dst, const void *src, cc_size cnt);
 
 void cc_memmove(void *dst, void *src, cc_size cnt);
 

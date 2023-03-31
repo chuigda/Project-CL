@@ -50,7 +50,7 @@ static inline void cc_hash_full_mul(cc_uint64 op1,
 }
 #endif
 
-static inline cc_hash_uint128 
+static inline cc_hash_uint128
 cc_hash_uint128_multiply(cc_hash_uint128 a, cc_hash_uint128 b) {
   cc_hash_uint128 result;
 #ifdef __SIZEOF_INT128__
@@ -68,7 +68,7 @@ cc_hash_uint128_multiply(cc_hash_uint128 a, cc_hash_uint128 b) {
   return result;
 }
 
-static inline cc_hash_uint128 
+static inline cc_hash_uint128
 cc_hash_cast_uint64_to_uint128(cc_uint64 low) {
   cc_hash_uint128 data;
   data.data[PROJECT_CL_IS_BIG_ENDIAN()] = low;
@@ -80,7 +80,7 @@ static inline cc_uint64 cc_hash_swap_bytes64(cc_uint64 x) {
 #if defined(__has_builtin) && __has_builtin(__builtin_bswap64)
   return __builtin_bswap64(x);
 #else
-  x = ((x << 8) & 0xFF00FF00FF00FF00ULL) | 
+  x = ((x << 8) & 0xFF00FF00FF00FF00ULL) |
       ((x >> 8) & 0x00FF00FF00FF00FFULL);
   x = ((x << 16) & 0xFFFF0000FFFF0000ULL) |
       ((x >> 16) & 0x0000FFFF0000FFFFULL);
@@ -155,7 +155,8 @@ static inline cc_uint64 cc_hash_rotate_left(cc_uint64 x, cc_uint64 y) {
 #if defined(__has_builtin) && __has_builtin(__builtin_rotateleft64)
   return __builtin_rotateleft64(x, y);
 #else
-  return (x << y) | (x >> (64 - y));
+
+  return (y == 0 || y == 64) ? x : ((x << y) | (x >> (64 - y)));
 #endif
 }
 
@@ -193,9 +194,9 @@ cc_hash_load_small_data(const void *source, cc_size length) {
   const uint8_t *data = (const uint8_t *)source;
   if (length >= 2) {
     if (length >= 4) {
-      buffer.data[0] = 
+      buffer.data[0] =
         (cc_uint64)cc_hash_load_uint32le(&data[0]);
-      buffer.data[1] = 
+      buffer.data[1] =
         (cc_uint64)cc_hash_load_uint32le(&data[length - 4]);
     } else {
       cc_uint16 head = cc_hash_load_uint16le(&data[0]);
@@ -221,9 +222,9 @@ typedef struct {
   cc_uint64 extra_keys[2];
 } cc_stable_hasher;
 
-static const 
+static const
 cc_size PROJECT_CL_STABLE_HASH_ROTATE = 23;
-static const 
+static const
 cc_size PROJECT_CL_STABLE_HASH_MULTIPLE = 6364136223846793005;
 
 static inline void cc_hash_stable_digest128(cc_stable_hasher *hasher,
@@ -255,7 +256,7 @@ cc_uint64 cc_finalize_stable_hasher(cc_hasher_handle hasher) {
   return hash;
 }
 
-static inline cc_uint64 
+static inline cc_uint64
 cc_hash_stable_mix_integer(cc_stable_hasher hasher,
                            cc_uint64 x,
                            cc_uint64 y) {
@@ -270,7 +271,7 @@ cc_hash_stable_mix_integer(cc_stable_hasher hasher,
   return cc_finalize_stable_hasher_inplace((cc_hasher_handle)&hasher);
 }
 
-static inline void 
+static inline void
 cc_initialize_stable_hasher_inplace(cc_hasher_handle hasher,
                                     cc_uint64 seed) {
   cc_stable_hasher *shasher = (cc_stable_hasher *)hasher;
@@ -464,14 +465,14 @@ cc_initialize_simd_hasher_inplace(cc_hasher_handle hasher,
   vhasher->key = cc_hash_simd_xor(vhasher->enc, vhasher->sum);
 }
 
-static inline cc_hasher_handle 
+static inline cc_hasher_handle
 cc_initialize_simd_hasher(cc_uint64 seed) {
   cc_hasher_handle hasher = cc_alloc2(sizeof(cc_simd_hasher), 16);
   cc_initialize_simd_hasher_inplace(hasher, seed);
   return hasher;
 }
 
-static inline void 
+static inline void
 cc_simd_hasher_digest(cc_hasher_handle hasher,
                       const void *input,
                       size_t length) {

@@ -9,12 +9,13 @@
 
 #   include <assert.h>
 #   include <cc_abort.h>
-
-#   define cc_assert(x)       \
-    do {                      \
-        if (!(x))             \
-        cc_dump_stacktrace(); \
-        assert(x);            \
+// since program maybe compiled with assume,
+// we need to make the predicate opaque
+#   define cc_assert(x)              \
+    do {                             \
+        if (!cc_opaque_predicate(x)) \
+            cc_dump_stacktrace();    \
+        assert(x);                   \
     } while (0)
 #else
 #   define cc_assert(x) cc_assert_impl((x), ##x, __FILE__, __LINE__);

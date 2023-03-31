@@ -45,7 +45,7 @@ $(SHARED_LIB_NAME): cc_defs.o $(OBJECT_FILES)
 define BUILD_TEST_ITEM
 	$(call LOG,BUILD,$1)
 	@$(CC) $(CFLAGS) $2 \
-		-Iconfig -Iinclude -Itest/kit \
+		-Iconfig -Iinclude -Isrc/include -Itest/kit \
 		-L. -lcl2 -lm -o $1
 endef
 
@@ -56,7 +56,7 @@ define RUN_TEST_ITEM
 endef
 
 .PHONY: test test-log
-test: test-log test_vec test_hash
+test: test-log test_vec test_hash test_swisstable test_hashmap
 
 test-log:
 	@echo Running tests
@@ -74,6 +74,21 @@ test_vec: test_vec.bin
 test_hash: test_hash.bin
 	$(call RUN_TEST_ITEM,test_hash,1,2)
 	$(call RUN_TEST_ITEM,test_hash,2,2)
+
+.PHONY: test_swisstable
+test_swisstable: test_swisstable.bin
+	$(call RUN_TEST_ITEM,test_swisstable,1,7)
+	$(call RUN_TEST_ITEM,test_swisstable,2,7)
+	$(call RUN_TEST_ITEM,test_swisstable,3,7)
+	$(call RUN_TEST_ITEM,test_swisstable,4,7)
+	$(call RUN_TEST_ITEM,test_swisstable,5,7)
+	$(call RUN_TEST_ITEM,test_swisstable,6,7)
+	$(call RUN_TEST_ITEM,test_swisstable,7,7)
+
+.PHONY: test_hashmap
+test_hashmap: test_hashmap.bin
+	$(call RUN_TEST_ITEM,test_hashmap,1,2)
+	$(call RUN_TEST_ITEM,test_hashmap,2,2)
 
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))

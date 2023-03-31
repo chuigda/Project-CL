@@ -18,7 +18,7 @@ jobs:
         include:
           - arch: aarch64
             distro: ubuntu_latest
-            EXTRA_CFLAGS:
+            EXTRA_CFLAGS: -march=armv8-a+nosimd
             identifier: generic
 
           - arch: aarch64

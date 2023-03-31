@@ -12,6 +12,7 @@ jobs:
       matrix:
         include:
           - EXTRA_CFLAGS: -march=native
+          - EXTRA_CFLAGS: -march=native -DNDEBUG
           - EXTRA_CFLAGS: -march=native -fsanitize=address
           - EXTRA_CFLAGS: -march=native -fsanitize=undefined
     runs-on: ubuntu-latest
@@ -20,4 +21,4 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build
-        run: env EXTRA_CFLAGS=${{ matrix.EXTRA_CFLAGS }} make test
+        run: env EXTRA_CFLAGS="${{ matrix.EXTRA_CFLAGS }}" make test
