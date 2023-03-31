@@ -5,10 +5,6 @@
 #include <cc_hash.h>
 #include <cc_memory.h>
 
-#if defined(__has_include) && __has_include(<stdio.h>)
-#   include <stdio.h>
-#endif
-
 typedef struct {
   cc_uint64 data;
 } random_state;
@@ -66,8 +62,9 @@ void bfs_insert(brutal_force_set *set, cc_uint64 target) {
   if (set->size == set->capacity)
     bfs_grow(set);
   cc_uint64 *position = bfs_binary_search(set, target);
-  if (*position != target) {
-    cc_memmove(position + 1, position,
+  if (position == set->data + set->size || *position != target) {
+    if (position != set->data + set->size)
+      cc_memmove(position + 1, position,
                sizeof(cc_uint64) * (set->data + set->size - position));
     set->size++;
     *position = target;
@@ -173,14 +170,11 @@ typedef enum {
 
 random_state default_random_state(void) {
   random_state state;
-//  state.data = ((cc_uint64)(cc_size)default_random_state);
-//  if (sizeof (cc_size) < sizeof(cc_uint64)) {
-//    state.data |= state.data << 32;
-//  }
-  state.data = 2370762699382508377;
-//#if defined(__has_include) && __has_include(<stdio.h>)
-//  fprintf(stderr, "random state: %llu\n", state.data);
-//#endif
+  state.data = ((cc_uint64)(cc_size)default_random_state);
+  if (sizeof (cc_size) < sizeof(cc_uint64)) {
+    state.data |= state.data << 32;
+  }
+  state.data ^= 2370766716244425513;
   return state;
 }
 

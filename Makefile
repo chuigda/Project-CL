@@ -2,7 +2,7 @@ ifndef CC
 	CC = gcc
 endif
 ifndef CFLAGS
-	CFLAGS = -Wall -Wextra -pedantic -O2 -g $(EXTRA_CFLAGS) -fsanitize=address
+	CFLAGS = -Wall -Wextra -pedantic -O2 -g $(EXTRA_CFLAGS)
 endif
 
 ifndef WIN32
