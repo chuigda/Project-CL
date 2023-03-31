@@ -1,4 +1,4 @@
-name: aarch64
+name: MultiArch
 
 on:
   push:
@@ -16,6 +16,11 @@ jobs:
     strategy:
       matrix:
         include:
+          - arch: armv7
+            distro: ubuntu_latest
+            EXTRA_CFLAGS:
+            identifier: generic
+
           - arch: aarch64
             distro: ubuntu_latest
             EXTRA_CFLAGS: -march=armv8-a+nosimd
