@@ -1,4 +1,4 @@
-name: x86-64
+name: MUSL
 
 on:
   push:
@@ -11,15 +11,29 @@ jobs:
     strategy:
       matrix:
         include:
-          - EXTRA_CFLAGS: -mno-sse2
-          - EXTRA_CFLAGS: -march=native
-          - EXTRA_CFLAGS: -march=native -DNDEBUG
-          - EXTRA_CFLAGS: -march=native -fsanitize=address
-          - EXTRA_CFLAGS: -march=native -fsanitize=undefined
+          - ARCH: i486
+          - ARCH: i686
+          - ARCH: x86-64
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
+      - name: Cache MUSL Toolchain
+        id: cache-musl-toolchain
+        uses: actions/cache@v3
+        with:
+          path: /toolchain
+          key: ${{ matrix.ARCH }}-musl-toolchain
+
+      - name: Generate Prime Numbers
+        if: steps.cache-primes.outputs.cache-hit != 'true'
+        run: |
+          cd /toolchain
+          wget https://musl.cc/${{ matrix.ARCH }}-linux-musl-cross.tgz
+          tar xvf ${{ matrix.ARCH }}-linux-musl-cross.tgz
+
       - name: Build
-        run: env EXTRA_CFLAGS="${{ matrix.EXTRA_CFLAGS }}" make test
+        run: |
+          export CC=/toolchain/${{ matrix.ARCH }}-linux-musl-cross/bin/${{ matrix.ARCH }}-linux-musl-cc
+          make test

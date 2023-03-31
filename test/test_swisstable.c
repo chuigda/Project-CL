@@ -5,6 +5,10 @@
 #include <cc_hash.h>
 #include <cc_memory.h>
 
+#if defined(__has_include) && __has_include(<stdio.h>)
+#   include <stdio.h>
+#endif
+
 typedef struct {
   cc_uint64 data;
 } random_state;
@@ -174,6 +178,9 @@ random_state default_random_state(void) {
     state.data |= state.data << 32;
   }
   state.data ^= 0x20E6F213CD45A379ULL;
+#if defined(__has_include) && __has_include(<stdio.h>)
+  vfprintf(stderr, "random state: %llu\n", state.data);
+#endif
   return state;
 }
 
