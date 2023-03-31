@@ -26,8 +26,8 @@ jobs:
           path: /toolchain
           key: ${{ matrix.ARCH }}-musl-toolchain
 
-      - name: Generate Prime Numbers
-        if: steps.cache-primes.outputs.cache-hit != 'true'
+      - name: Download MUSL Toolchain
+        if: steps.cache-musl-toolchain.outputs.cache-hit != 'true'
         run: |
           sudo mkdir -p /toolchain
           sudo chmod 777 /toolchain

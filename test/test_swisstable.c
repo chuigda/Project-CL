@@ -184,7 +184,11 @@ test_action next_test_action(random_state *state) {
 }
 
 cc_uint64 good_hash_function(void *state, const void *key) {
-  return cc_unstable_hash(key, sizeof(cc_uint64), (cc_uint64)state);
+  cc_uint64 seed = (cc_uint64)(cc_size)state;
+  if (sizeof (cc_size) < sizeof(cc_uint64)) {
+    seed |= seed << 32;
+  }
+  return cc_unstable_hash(key, sizeof(cc_uint64), seed);
 }
 
 cc_uint64 bad_hash_function(void *state, const void *key) {
