@@ -179,7 +179,7 @@ random_state default_random_state(void) {
   }
   state.data ^= 0x20E6F213CD45A379ULL;
 #if defined(__has_include) && __has_include(<stdio.h>)
-  vfprintf(stderr, "random state: %llu\n", state.data);
+  fprintf(stderr, "random state: %llu\n", state.data);
 #endif
   return state;
 }
