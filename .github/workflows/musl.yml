@@ -1,0 +1,25 @@
+name: x86-64
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - EXTRA_CFLAGS: -mno-sse2
+          - EXTRA_CFLAGS: -march=native
+          - EXTRA_CFLAGS: -march=native -DNDEBUG
+          - EXTRA_CFLAGS: -march=native -fsanitize=address
+          - EXTRA_CFLAGS: -march=native -fsanitize=undefined
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build
+        run: env EXTRA_CFLAGS="${{ matrix.EXTRA_CFLAGS }}" make test
