@@ -62,8 +62,9 @@ void bfs_insert(brutal_force_set *set, cc_uint64 target) {
   if (set->size == set->capacity)
     bfs_grow(set);
   cc_uint64 *position = bfs_binary_search(set, target);
-  if (*position != target) {
-    cc_memmove(position + 1, position,
+  if (position == set->data + set->size || *position != target) {
+    if (position != set->data + set->size)
+      cc_memmove(position + 1, position,
                sizeof(cc_uint64) * (set->data + set->size - position));
     set->size++;
     *position = target;
@@ -169,7 +170,11 @@ typedef enum {
 
 random_state default_random_state(void) {
   random_state state;
-  state.data = ((cc_uint64)default_random_state) ^ 0x20E6F213CD45A379ULL;
+  state.data = ((cc_uint64)(cc_size)default_random_state);
+  if (sizeof (cc_size) < sizeof(cc_uint64)) {
+    state.data |= state.data << 32;
+  }
+  state.data ^= 2370766716244425513;
   return state;
 }
 
@@ -179,7 +184,11 @@ test_action next_test_action(random_state *state) {
 }
 
 cc_uint64 good_hash_function(void *state, const void *key) {
-  return cc_unstable_hash(key, sizeof(cc_uint64), (cc_uint64)state);
+  cc_uint64 seed = (cc_uint64)(cc_size)state;
+  if (sizeof (cc_size) < sizeof(cc_uint64)) {
+    seed |= seed << 32;
+  }
+  return cc_unstable_hash(key, sizeof(cc_uint64), seed);
 }
 
 cc_uint64 bad_hash_function(void *state, const void *key) {

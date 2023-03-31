@@ -1,0 +1,45 @@
+name: musl
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - ARCH: i486
+          - ARCH: i686
+          - ARCH: x86_64
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create Toolchain Directories
+        run: |
+          sudo mkdir -p /toolchain
+          sudo chmod 777 /toolchain
+
+      - name: Cache MUSL Toolchain
+        id: cache-musl-toolchain
+        uses: john-shaffer/cache@main
+        with:
+          path: /toolchain
+          key: ${{ matrix.ARCH }}-musl-toolchain
+
+      - name: Download MUSL Toolchain
+        if: steps.cache-musl-toolchain.outputs.cache-hit != 'true'
+        run: |
+          cd /toolchain
+          wget https://musl.cc/${{ matrix.ARCH }}-linux-musl-cross.tgz
+          tar xvf ${{ matrix.ARCH }}-linux-musl-cross.tgz
+
+      - name: Build
+        run: |
+          export CC=/toolchain/${{ matrix.ARCH }}-linux-musl-cross/bin/${{ matrix.ARCH }}-linux-musl-cc
+          export LD_LIBRARY_PATH=/toolchain/${{ matrix.ARCH }}-linux-musl-cross/${{ matrix.ARCH }}-linux-musl/lib
+          make EXTRA_CFLAGS=-static test

@@ -1,6 +1,12 @@
 ifndef CC
 	CC = gcc
 endif
+ifndef AR
+	AR = ar
+endif
+ifndef RANLIB
+	RANLIB = ranlib
+endif
 ifndef CFLAGS
 	CFLAGS = -Wall -Wextra -pedantic -O2 -g $(EXTRA_CFLAGS)
 endif
@@ -39,6 +45,13 @@ $(SHARED_LIB_NAME): cc_defs.o $(OBJECT_FILES)
 	$(call LOG,LD,$(SHARED_LIB_NAME))
 	@$(CC) $(CFLAGS) $(OBJECT_FILES) -fPIC -shared -o $(SHARED_LIB_NAME)
 
+libcl2.a: cc_defs.o $(OBJECT_FILES)
+	$(call LOG,AR,libcl2.a)
+	@$(AR) -rc $@ $(OBJECT_FILES)
+	$(call LOG,RANLIB,libcl2.a)
+	@$(RANLIB) $@
+
+
 %.o: src/%.c $(HEADER_FILES) src/include/cc_impl.h
 	$(call COMPILE,$<,$@)
 
@@ -46,12 +59,12 @@ define BUILD_TEST_ITEM
 	$(call LOG,BUILD,$1)
 	@$(CC) $(CFLAGS) $2 \
 		-Iconfig -Iinclude -Isrc/include -Itest/kit \
-		-L. -lcl2 -lm -o $1
+		-L. -Wl,-rpath,. -lcl2 -lm -o $1
 endef
 
 define RUN_TEST_ITEM
 	@printf '\tTEST\t%s\t\t\tCASE %s/%s\t' $1 $2 $3
-	@LD_LIBRARY_PATH=. ./$1.bin $2 > /dev/null
+	@./$1.bin $2 1> /dev/null
 	@printf 'PASS\n'
 endef
 
@@ -93,7 +106,7 @@ test_hashmap: test_hashmap.bin
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))
 
-%.bin: test/%.c $(SHARED_LIB_NAME)
+%.bin: test/%.c $(SHARED_LIB_NAME) libcl2.a
 	$(call BUILD_TEST_ITEM,$@,$<)
 
 .PHONY: clean
