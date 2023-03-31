@@ -5,7 +5,10 @@
 #include <cc_memory.h>
 
 cc_uint64 uint64_hash(void *seed, const void *key) {
-  cc_uint64 seed_val = (cc_uint64)seed;
+  cc_uint64 seed_val = (cc_uint64)(cc_size)seed;
+  if (sizeof (cc_size) < sizeof(cc_uint64)) {
+    seed_val |= seed_val << 32;
+  }
   return cc_unstable_hash(key, sizeof(cc_uint64), seed_val);
 }
 
