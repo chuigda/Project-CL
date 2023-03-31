@@ -39,4 +39,4 @@ jobs:
         run: |
           export CC=/toolchain/${{ matrix.ARCH }}-linux-musl-cross/bin/${{ matrix.ARCH }}-linux-musl-cc
           export LD_LIBRARY_PATH=/toolchain/${{ matrix.ARCH }}-linux-musl-cross/${{ matrix.ARCH }}-linux-musl/lib
-          make test
+          make EXTRA_CFLAGS=-static test
