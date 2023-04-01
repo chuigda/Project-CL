@@ -148,7 +148,10 @@ cc_char *cc_string_cstr(cc_string *s) {
     return buf;
 }
 
-cc_char *cc_string_own_cstr(cc_string *s, cc_size *o_len, cc_size *o_cap) {
+cc_char *cc_string_own_cstr(cc_string *s,
+                            cc_size *o_len,
+                            cc_size *o_cap) 
+{
     RT_CONTRACT2(s, NULL);
     cc_char *buf = s->buf;
     if (o_len) *o_len = s->len;
@@ -181,6 +184,7 @@ cc_bool cc_string_iter_has_next(cc_string_iter *it) {
 
 cc_error cc_string_iter_next(cc_string_iter *it, cc_rune *o_res) {
     RT_CONTRACT_E(it);
+
     if (!cc_string_iter_has_next(it)) {
         return CC_END_OF_ITERATOR;
     }

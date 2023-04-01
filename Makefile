@@ -103,6 +103,12 @@ test_hashmap: test_hashmap.bin
 	$(call RUN_TEST_ITEM,test_hashmap,1,2)
 	$(call RUN_TEST_ITEM,test_hashmap,2,2)
 
+.PHONY: test_string
+test_string: test_string.bin
+	$(call RUN_TEST_ITEM,test_string,1,3)
+	$(call RUN_TEST_ITEM,test_string,2,3)
+	$(call RUN_TEST_ITEM,test_string,3,3)
+
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))
 

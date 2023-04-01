@@ -51,12 +51,12 @@ void test2(void) {
     cc_size i = 0;
     while (cc_string_iter_has_next(it)) {
         cc_assert(cc_string_iter_next(it, &r) == CC_NO_ERROR);
-        // cc_assert(r == rs[i]);
+        cc_assert(r == rs[i]);
         printf("%d\n", r);
         i++;
     }
-    cc_string_iter_destroy(it);
 
+    cc_string_iter_destroy(it);
     cc_string_destroy(str);
 }
 
