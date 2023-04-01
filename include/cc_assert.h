@@ -9,7 +9,7 @@
 #   include <assert.h>
 #   define cc_assert assert
 #else
-#   define cc_assert(x) cc_assert_impl((x), #x, __FILE__, __LINE__);
+#   define cc_assert(x) cc_assert_impl((int)(cc_size)(x), #x, __FILE__, __LINE__);
 #ifdef __cplusplus
 extern "C"
 #endif
