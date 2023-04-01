@@ -33,7 +33,7 @@ _Bool bfs_find(brutal_force_set *set, cc_uint64 target) {
   if (!size) {
     return 0;
   }
-  uint64_t* buf = (uint64_t*)cc_vec_front(set->vector);
+  const uint64_t* __restrict buf = (uint64_t*)cc_vec_front(set->vector);
   for (cc_size i = 0; i < size; ++i) {
     if (buf[i] == target) {
       return 1;
