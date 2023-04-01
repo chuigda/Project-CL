@@ -26,6 +26,8 @@ void cc_vec_destroy(cc_vec *vec);
 
 void cc_vec_dtor(void *vec);
 
+cc_size cc_vec_item_size(cc_vec *vec);
+
 cc_size cc_vec_size(cc_vec *vec);
 
 cc_size cc_vec_cap(cc_vec *vec);

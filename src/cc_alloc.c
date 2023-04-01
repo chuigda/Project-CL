@@ -23,6 +23,10 @@ void *cc_alloc2(cc_size size, cc_size align) {
 #       endif
 }
 
+void *cc_realloc(void *ptr, cc_size size) {
+    return realloc(ptr, size);
+}
+
 void cc_free(void *ptr) {
     free(ptr);
 }
