@@ -3,10 +3,6 @@
 
 #include <cc_defs.h>
 
-#if defined(PROJECT_CL_ASSERT_USE_LIBC) && defined(PROJECT_CL_ASSERT_USE_CCLIB)
-#   error "multiple implementation of assert is not allowed"
-#endif
-
 #if !defined(PROJECT_CL_BUILD_ASSERT) || defined(NDEBUG)
 #   define cc_assert(x)
 #elif defined(PROJECT_CL_ASSERT_USE_LIBC)
