@@ -69,7 +69,13 @@ define RUN_TEST_ITEM
 endef
 
 .PHONY: test test-log
-test: test-log test_vec test_hash test_swisstable test_hashmap
+test: \
+	test-log \
+	test_vec \
+	test_hash \
+	test_swisstable \
+	test_hashmap \
+	test_string
 
 test-log:
 	@echo Running tests
