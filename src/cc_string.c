@@ -78,6 +78,36 @@ cc_error cc_string_push_char(cc_string *s, cc_char c) {
     return CC_NO_ERROR;
 }
 
+cc_uint8 cc_string_push_rune(cc_string *s, cc_rune r) {
+    RT_CONTRACT2(s, 0);
+    if (r <= 0x7F) {
+        cc_string_push_char(s, r);
+        return 1;
+    }
+    if (r <= 0x7FF) {
+        cc_string_push_char(s, 0xC0 | (r >> 6));
+        cc_string_push_char(s, 0x80 | (r & 0x3F));
+        return 2;
+    }
+    if (r <= 0xFFFF) {
+        // detect surrogates
+        if (r >= 0xD800 && r <= 0xDFFF) return 0;
+        if (r == 0xFFFE || r == 0xFFFF) return 0;
+        cc_string_push_char(s, 0xE0 | (r >> 12));
+        cc_string_push_char(s, 0x80 | ((r >> 6) & 0x3F));
+        cc_string_push_char(s, 0x80 | (r & 0x3F));
+        return 3;
+    }
+    if (r <= 0x10FFFF) {
+        cc_string_push_char(s, 0xF0 | (r >> 18));
+        cc_string_push_char(s, 0x80 | ((r >> 12) & 0x3F));
+        cc_string_push_char(s, 0x80 | ((r >> 6) & 0x3F));
+        cc_string_push_char(s, 0x80 | (r & 0x3F));
+        return 4;
+    }
+    return 0;
+}
+
 cc_error cc_string_appendn(cc_string *s, const cc_char *s2, cc_size n) {
     RT_CONTRACT_E(s && s2);
     cc_error err;

@@ -28,6 +28,8 @@ void cc_string_destroy(cc_string *s);
 
 cc_error cc_string_push_char(cc_string *s, cc_char c);
 
+cc_uint8 cc_string_push_rune(cc_string *s, cc_rune r);
+
 cc_error cc_string_appendn(cc_string *s, const cc_char *s2, cc_size n);
 
 cc_error cc_string_appends(cc_string *s, const cc_char *s2);

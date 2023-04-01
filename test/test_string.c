@@ -44,7 +44,7 @@ void test2(void) {
     cc_string_append_strlit(str, "只因你太美");
 
     cc_assert(cc_string_len(str) == sizeof("只因你太美") - 1);
-    const cc_rune rs[] = {21482, 22240, 20320, 22286, 32654};
+    const cc_rune rs[] = {21482, 22240, 20320, 22826, 32654};
     
     cc_string_iter *it = cc_string_iterator(str);
     cc_rune r = 0;
@@ -60,10 +60,33 @@ void test2(void) {
     cc_string_destroy(str);
 }
 
+void test3(void) {
+    cc_string *str = cc_string_init();
+    cc_assert(str);
+
+    cc_string_push_rune(str, 21482u);
+    cc_string_push_rune(str, 22240u);
+    cc_string_push_rune(str, 20320u);
+    cc_string_push_rune(str, 22826u);
+    cc_string_push_rune(str, 32654u);
+
+    cc_size len = sizeof("只因你太美") - 1;
+    cc_assert(cc_string_len(str) == len);
+    const cc_char *expected = "只因你太美";
+    cc_char *s = cc_string_cstr(str);
+    for (cc_size i = 0; i < len; i++) {
+        cc_assert(s[i] == expected[i]);
+    }
+    cc_free(s);
+
+    cc_string_destroy(str);
+}
+
 
 BEGIN_TEST
 
     AUTO_TEST_ITEM(1)
     AUTO_TEST_ITEM(2)
+    AUTO_TEST_ITEM(3)
 
 END_TEST
