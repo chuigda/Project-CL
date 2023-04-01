@@ -218,6 +218,14 @@ _Bool cc_opaque_predicate(_Bool x) {
 #   endif
 #endif
 
+#ifndef CC_ATTRIBUTE_COLD
+#   if defined(__has_attribute) && __has_attribute(cold)
+#       define CC_ATTRIBUTE_ALWAYS_INLINE __attribute__((cold))
+#   else
+#       define CC_ATTRIBUTE_ALWAYS_INLINE
+#   endif
+#endif
+
 typedef struct {
     cc_size size;
     cc_size alignment;

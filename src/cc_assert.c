@@ -8,13 +8,13 @@
 #if defined(PROJECT_CL_BUILD_ASSERT) && \
     !defined(NDEBUG) && \
     !defined(PROJECT_CL_ASSERT_USE_LIBC)
-void cc_assert_impl(int value,
+CC_ATTRIBUTE_EXPORT CC_ATTRIBUTE_COLD
+void cc_assert_failure_impl(
                     const char *expr,
                     const char *file,
                     int line) {
   // use opaque predicate anyway.
   // can potentially help in LTO.
-  if (!cc_opaque_predicate(value)) {
 #if defined(__linux__) || defined(__APPLE__)
     if (fsync(STDERR_FILENO)) {}
     if (fsync(STDOUT_FILENO)) {}
@@ -46,6 +46,5 @@ void cc_assert_impl(int value,
 #endif
     cc_dump_stacktrace();
     cc_abort();
-  }
 }
 #endif
