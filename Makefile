@@ -75,7 +75,8 @@ test: \
 	test_hash \
 	test_swisstable \
 	test_hashmap \
-	test_string
+	test_string \
+	test_encoding
 
 test-log:
 	@echo Running tests
@@ -114,6 +115,11 @@ test_string: test_string.bin
 	$(call RUN_TEST_ITEM,test_string,1,3)
 	$(call RUN_TEST_ITEM,test_string,2,3)
 	$(call RUN_TEST_ITEM,test_string,3,3)
+
+.PHONY: test_encoding
+test_encoding: test_encoding.bin
+	$(call RUN_TEST_ITEM,test_encoding,1,2)
+	$(call RUN_TEST_ITEM,test_encoding,2,2)
 
 TEST_SOURCE_FILES = $(wildcard test/*.c)
 TEST_BIN_FILES := $(patsubst test/%.c,%.bin,$(TEST_SOURCE_FILES))
