@@ -4,6 +4,7 @@
 #include <cc_alloc.h>
 #include <cc_hash.h>
 #include <cc_memory.h>
+#include <cc_vec.h>
 
 typedef struct {
   cc_uint64 data;
@@ -18,73 +19,48 @@ cc_uint64 xorshift64(random_state *state) {
 }
 
 typedef struct {
-  cc_size capacity;
-  cc_size size;
-  cc_uint64 *data;
+  cc_vec * vector;
 } brutal_force_set;
 
 brutal_force_set bfs_create(void) {
   brutal_force_set set;
-  set.capacity = 16;
-  set.size = 0;
-  set.data = (cc_uint64 *)cc_alloc(sizeof(cc_uint64) * set.capacity);
+  set.vector = cc_vec_init(sizeof(cc_uint64), NULL);
   return set;
 }
 
-cc_uint64 *bfs_binary_search(brutal_force_set *set, cc_uint64 target) {
-  cc_size l = 0;
-  cc_size r = set->size;
-  while (l < r) {
-    cc_size mid = (l + r) / 2;
-    if (set->data[mid] == target) {
-      return &set->data[mid];
-    }
-    if (set->data[mid] < target) {
-      l = mid + 1;
-    }
-    if (set->data[mid] > target) {
-      r = mid;
+_Bool bfs_find(brutal_force_set *set, cc_uint64 target) {
+  cc_size size = cc_vec_size(set->vector);
+  if (!size) {
+    return 0;
+  }
+  const uint64_t* __restrict buf = (uint64_t*)cc_vec_front(set->vector);
+  for (cc_size i = 0; i < size; ++i) {
+    if (buf[i] == target) {
+      return 1;
     }
   }
-  return &set->data[l];
-}
-
-void bfs_grow(brutal_force_set *set) {
-  cc_uint64 *data =
-      (cc_uint64 *)(cc_alloc(sizeof(cc_uint64) * set->capacity * 2));
-  cc_memcpy(data, set->data, sizeof(cc_uint64) * set->size);
-  cc_free(set->data);
-  set->capacity *= 2;
-  set->data = data;
+  return 0;
 }
 
 void bfs_insert(brutal_force_set *set, cc_uint64 target) {
-  if (set->size == set->capacity)
-    bfs_grow(set);
-  cc_uint64 *position = bfs_binary_search(set, target);
-  if (position == set->data + set->size || *position != target) {
-    if (position != set->data + set->size)
-      cc_memmove(position + 1, position,
-               sizeof(cc_uint64) * (set->data + set->size - position));
-    set->size++;
-    *position = target;
+  if (!bfs_find(set, target)) {
+    cc_vec_push(set->vector, &target);
   }
 }
 
-_Bool bfs_find(brutal_force_set *set, cc_uint64 target) {
-  return set->size && target == *bfs_binary_search(set, target);
+_Bool remove_check(void * x, void * y) {
+  return *(cc_uint64 *)x = *(cc_uint64 *)y;
 }
 
 void bfs_erase(brutal_force_set *set, cc_uint64 target) {
-  cc_uint64 *position = bfs_binary_search(set, target);
-  if (*position == target) {
-    cc_memmove(position, position + 1,
-               sizeof(cc_uint64) * (set->data + set->size - position - 1));
-    set->size--;
-  }
+  cc_vec_remove_if2(set->vector, remove_check, &target);
 }
 
-void bfs_destroy(brutal_force_set *set) { cc_free(set->data); }
+cc_uint64 * bfs_at(brutal_force_set *set, cc_size i) {
+  return (cc_uint64 *)cc_vec_at(set->vector, i);
+}
+
+void bfs_destroy(brutal_force_set *set) { cc_vec_destroy(set->vector); }
 
 #define assert_invalid_size(x)                                                 \
   cc_assert(!cc_st_safe_size_is_valid(cc_st_safe_size_create((cc_size)(x))))
@@ -269,23 +245,24 @@ void random_walk(cc_size attempts, cc_swisstable_hasher hasher) {
       break;
     }
     case TEST_ACTION_FIND: {
-      if (!set.size)
+      if (!cc_vec_size(set.vector))
         continue;
       cc_uint64 x = xorshift64(&state);
       cc_assert(((_Bool)cc_swisstable_find(&table, &x, hasher, equality)) ==
                 bfs_find(&set, x));
-      cc_size index = x % set.size;
-      cc_assert(*(cc_uint64 *)cc_swisstable_find(&table, &set.data[index],
-                                                 hasher,
-                                                 equality) == set.data[index]);
+      cc_size idx = x % cc_vec_size(set.vector);
+      cc_assert(*(cc_uint64 *)cc_swisstable_find(
+                    &table,
+                    bfs_at(&set, idx),
+                    hasher, equality) == *bfs_at(&set, idx));
       break;
     }
     case TEST_ACTION_DELETE: {
-      if (!set.size)
+      if (!cc_vec_size(set.vector))
         continue;
       cc_uint64 x = xorshift64(&state);
-      cc_size index = (cc_size)x % set.size;
-      cc_uint64 target = set.data[index];
+      cc_size idx = (cc_size)x % cc_vec_size(set.vector);
+      cc_uint64 target = *bfs_at(&set, idx);
       bfs_erase(&set, target);
       cc_assert(*(cc_uint64 *)cc_swisstable_find(&table, &target, hasher,
                                                  equality) == target);
@@ -298,9 +275,10 @@ void random_walk(cc_size attempts, cc_swisstable_hasher hasher) {
       continue;
     }
   }
-  for (cc_size i = 0; i < set.size; ++i) {
-    cc_assert(*(cc_uint64 *)cc_swisstable_find(&table, &set.data[i], hasher,
-                                               equality) == set.data[i]);
+  for (cc_size i = 0; i < cc_vec_size(set.vector); ++i) {
+    cc_assert(*(cc_uint64 *)cc_swisstable_find(
+                  &table, bfs_at(&set, i), hasher, equality)
+              == *bfs_at(&set, i));
   }
   for (cc_size i = 0; i < attempts; ++i) {
     cc_uint64 x = xorshift64(&state);
@@ -383,7 +361,7 @@ void iterator_test(cc_size size, cc_swisstable_hasher hasher) {
     cc_assert(bfs_find(&set, *(cc_uint64 *)ptr));
     ptr = cc_swisstable_iter_next(&iter);
   }
-  cc_assert(i == set.size);
+  cc_assert(i == cc_vec_size(set.vector));
   bfs_destroy(&set);
   cc_swisstable_destroy(&table);
 }

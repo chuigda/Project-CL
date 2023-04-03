@@ -9,11 +9,17 @@
 #   include <assert.h>
 #   define cc_assert assert
 #else
-#   define cc_assert(x) cc_assert_impl((x), ##x, __FILE__, __LINE__);
-extern "C" void cc_assert_impl(int value,
-                               const char *expr,
-                               const char *file,
-                               int line);
+#   define cc_assert(x)                                  \
+  (CC_LIKELY(x)                                          \
+       ? (void)(0)                                       \
+       : cc_assert_failure_impl(#x, __FILE__, __LINE__));
+#ifdef __cplusplus
+extern "C"
+#endif
+CC_ATTRIBUTE_EXPORT CC_ATTRIBUTE_COLD
+void cc_assert_failure_impl(const char *expr,
+                            const char *file,
+                           int line);
 #endif
 
 #endif /* PROJECT_CL_CC_ASSERT_H */

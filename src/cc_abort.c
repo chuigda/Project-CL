@@ -36,9 +36,12 @@ _Bool cc_dump_stacktrace(void) {
     void *array[64];
     int size;
     size = backtrace(array, 64);
-    if (write(0, "\n\n", 2)) {}
-    backtrace_symbols_fd(array, size, 0);
-    if (write(0, "\n", 1)) {}
+    if (fsync(STDERR_FILENO)) {}
+    if (fsync(STDOUT_FILENO)) {}
+    if (write(STDERR_FILENO, "\n\n", 2)) {}
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
+    if (write(STDERR_FILENO, "\n", 1)) {}
+    if (fsync(STDOUT_FILENO)) {}
     return 1;
 }
 

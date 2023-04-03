@@ -50,7 +50,8 @@ void test2(void) {
     cc_rune r = 0;
     cc_size i = 0;
     while (cc_string_iter_has_next(it)) {
-        cc_assert(cc_string_iter_next(it, &r) == CC_NO_ERROR);
+        cc_error result = cc_string_iter_next(it, &r);
+        cc_assert(result == CC_NO_ERROR);
         cc_assert(r == rs[i]);
         printf("%d\n", r);
         i++;
