@@ -19,9 +19,9 @@ extern "C" {
 * Returns: Allocated buffer of out_len bytes of encoded data,
 * or empty string on failure
 */
-cc_char *base64_encode(const void *src, const cc_size len, cc_size *o_len);
+cc_char *cc_base64_encode(const void *src, const cc_size len, cc_size *o_len);
 
-cc_uchar *base64_decode(const cc_char *data, const cc_size len, cc_size *o_len);
+cc_uchar *cc_base64_decode(const cc_char *data, const cc_size len, cc_size *o_len);
 
 #ifdef __cplusplus
 } /* extern "C" */
