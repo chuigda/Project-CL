@@ -37,7 +37,7 @@ cc_st_group_match_ctrl(cc_st_group group, cc_st_ctrl byte)
     cc_st_group duplicated = vdup_n_s8((int8_t)byte);
     cc_st_group cmp = vceq_s8(group, duplicated);
     cc_st_bitmask converted = vget_lane_u64(vreinterpret_u64_u8(cmp), 0);
-    iter.mask = converted;
+    iter.mask = converted & cc_st_word_mask();
     return iter;
 }
 
